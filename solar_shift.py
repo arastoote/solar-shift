@@ -9,6 +9,15 @@ st.set_page_config(
     layout="wide"
 )
 
+st.html("""
+    <style>
+        .stMainBlockContainer {
+            max-width:80rem;
+        }
+    </style>
+    """
+)
+
 @st.cache_data
 def get_data():
     data =  pd.read_csv("all_the_cases.csv")
