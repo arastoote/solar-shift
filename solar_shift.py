@@ -11,17 +11,39 @@ st.set_page_config(
 
 @st.cache_data
 def get_data():
-    return pd.read_csv("all_the_cases.csv")
+    data =  pd.read_csv("all_the_cases.csv")
+    data = data.rename(
+        columns={
+            "location": "Location",
+            "household_size": "Household occupants",
+            "tariff_type": "Tariff",
+            "control_type": "Heater control",
+            "annual_energy_cost": "Cost ($/yr)",
+            "heater_type": "Heater",
+            "has_solar": "Solar",
+            "emissions_total": "CO2 emissions (tons/yr)"
+        }
+    )
+    data["Heater"] = data["Heater"].map(
+        {
+            "resistive": "Electric",
+            "heat_pump": "Heat Pump",
+            "solar_thermal": "Solar Thermal",
+            "gas_instant": "Gas Instant",
+            "gas_storage": "Gas Storage",
+        }
+    )
+    return data
 
 data = get_data()
 
 groups = [
-    "location",
-    "household_size",
-    "heater_type",
-    "tariff_type",
-    "control_type",
-    "has_solar"
+    "Location",
+    "Household occupants",
+    "Heater",
+    "Tariff",
+    "Heater control",
+    "Solar"
 ]
 
 home, explore, compare = st.tabs(["Home", "Explore", "Compare"])
@@ -55,73 +77,69 @@ with home:
 
 with explore:
     top = st.container()
+    middle = st.container()
     bottom = st.container()
-    with top:
 
-        left_col, padding_left, right_col, padding = st.columns([3, 0.5, 7, 0.5])
+    with middle:
 
-        with left_col:
-            with st.expander("Your house", expanded=True):
-                hs = st.multiselect("Household size", data["household_size"].unique(), default=3)
-                locs = st.multiselect("Location", data["location"].unique())
-                tariffs = st.multiselect("Tariff", data["tariff_type"].unique())
-                solar = st.multiselect("Solar", data["has_solar"].unique())
+        middle_left, middle_middle, middle_right = st.columns([1, 1, 1])
+
+        with middle_left:
+            with st.expander("Your house"):
+                hs = st.multiselect("Household size", data["Household occupants"].unique(), default=3)
+                locs = st.multiselect("Location", data["Location"].unique())
+                tariffs = st.multiselect("Tariff", data["Tariff"].unique())
+                solar = st.multiselect("Solar", data["Solar"].unique())
+        with middle_middle:
             with st.expander("Heater choices"):
-                heater = st.multiselect("Heater type", data["heater_type"].unique())
-                control = st.multiselect("Control type", data["control_type"].unique())
-            # with st.expander("Plot comparisons"):
-            #     x = st.selectbox("Side-by-side", groups, index=0)
-            #     color = st.selectbox("Color", groups)
+                heater = st.multiselect("Heater type", data["Heater"].unique())
+                control = st.multiselect("Control type", data["Heater control"].unique())
+        with middle_right:
+            with st.expander("Compare"):
+                x = st.selectbox("Side-by-side", groups, index=2)
+                color = st.selectbox("Color", groups, index=2)
 
         f_data = data.copy()
 
         if len(hs) > 0:
-            f_data = f_data[f_data["household_size"].isin(hs)]
+            f_data = f_data[f_data["Household occupants"].isin(hs)]
 
         if len(locs) > 0:
-            f_data = f_data[f_data["location"].isin(locs)]
+            f_data = f_data[f_data["Location"].isin(locs)]
 
         if len(tariffs) > 0:
-            f_data = f_data[f_data["tariff_type"].isin(tariffs)]
+            f_data = f_data[f_data["Tariff"].isin(tariffs)]
 
         if len(solar) > 0:
-            f_data = f_data[f_data["has_solar"].isin(solar)]
+            f_data = f_data[f_data["Solar"].isin(solar)]
 
         if len(control) > 0:
-            f_data = f_data[f_data["control_type"].isin(control)]
+            f_data = f_data[f_data["Heater control"].isin(control)]
 
         if len(heater) > 0:
-            f_data = f_data[f_data["heater_type"].isin(heater)]
+            f_data = f_data[f_data["Heater"].isin(heater)]
 
-
-    show_data = f_data.loc[:, [
-            "location",
-            "household_size",
-            "heater_type",
-            "tariff_type",
-            "control_type",
-            "has_solar",
-            "annual_energy_cost",
-            "emissions_total"
-        ]
-    ]
-
-
-    with bottom:
-        bl, bm, br, _ = st.columns([2.5, 2, 2, 1])
-        with bm:
-            x = st.selectbox("Side-by-side", groups, index=2)
-        with br:
-            color = st.selectbox("Color", groups, index=2)
-
+        show_data = f_data.loc[:, [
+                                      "Location",
+                                      "Household occupants",
+                                      "Heater",
+                                      "Tariff",
+                                      "Heater control",
+                                      "Solar",
+                                      "Cost ($/yr)",
+                                      "CO2 emissions (tons/yr)"
+                                  ]
+                    ]
 
     with top:
+
         chart = px.strip(
             f_data,
-            y='annual_energy_cost',
+            y='Cost ($/yr)',
             x=x,
             color=color
         )
+
         chart.update_traces(width=2.0)
 
         chart.update_layout(
@@ -131,8 +149,7 @@ with explore:
             }
         )
 
-        with right_col:
-            st.plotly_chart(chart, use_container_width=True)
+        st.plotly_chart(chart, use_container_width=True)
 
 
     with bottom:
@@ -140,7 +157,7 @@ with explore:
         summarise = st.radio("", ["Average", "Show all"])
         if len(table_groups) > 0 and summarise == "Average":
             show_data = show_data.groupby(table_groups, as_index=False).agg(
-                {"annual_energy_cost": "mean", "emissions_total": "mean"}
+                {"Cost ($/yr)": "mean", "CO2 emissions (tons/yr)": "mean"}
             )
-        show_data = show_data.sort_values("annual_energy_cost")
+        show_data = show_data.sort_values("Cost ($/yr)")
         st.dataframe(show_data.style.format(precision=2), hide_index=True)
