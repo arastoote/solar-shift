@@ -3,6 +3,7 @@ from streamlit.components.v1 import html
 import pandas as pd
 import plotly.express as px
 import time
+from PIL import Image
 
 from graphics import (
     draw_logo,
@@ -17,9 +18,12 @@ from data_preprocessing import (
     process_system_data
 )
 
+im = Image.open("favicon.png")
+
 st.set_page_config(
     page_title="Explore!",
     layout="wide",
+    page_icon=im
 )
 
 st.html("""
