@@ -1,7 +1,7 @@
 
 def draw_logo():
     svg_code = """
-    <div style="height: 50vh; display: flex; justify-content: center; align-items: center;">
+    <div style="height: 50vh; display: flex; justify-content: center; align-items: center; pointer-events: none; position: static;">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 350">
       <!-- Transparent background -->
       <rect width="600" height="350" fill="none" />
