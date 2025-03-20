@@ -14,7 +14,6 @@ from data_preprocessing import (
     load_and_preprocess_data,
     metrics,
     groups,
-    other,
     process_system_data
 )
 
@@ -63,7 +62,6 @@ tab[{tab}].click()
 
 
 with home:
-    # st.header("Welcome to the Solar Shift Explorer!")
     st.markdown("<h1 style='text-align: center; color: #FFA000;'>Welcome to the Solar Shift Explorer!</h1>",
                 unsafe_allow_html=True)
 
@@ -138,7 +136,7 @@ with explore:
         if len(heater) > 0:
             f_data = f_data[f_data["Heater"].isin(heater)]
 
-        show_data = f_data.loc[:,other + groups + metrics]
+        show_data = f_data.loc[:,groups + metrics]
 
     with top:
 
@@ -177,28 +175,20 @@ with (compare):
     system_two_width = 1
 
     with system_config:
-        with st.container():
-            label, left, right = st.columns([label_width, system_one_width, system_two_width])
-
-            with left:
-                st.markdown("System One")
-
-            with right:
-                st.markdown("System One")
-
-    with st.container():
         label, left, right = st.columns([label_width, system_one_width, system_two_width])
+        with left:
+            st.markdown("System One")
+        with right:
+            st.markdown("System One")
 
+        label, left, right = st.columns([label_width, system_one_width, system_two_width])
         with label:
             st.markdown("Location")
-
         with left:
             location_one = create_select("Location", "Sydney", "one")
-
         with right:
             location_two = create_select("Location", "Sydney", "two")
 
-    with st.container():
         label, left, right = st.columns([label_width, system_one_width, system_two_width])
         with label:
             st.markdown("Household occupants")
@@ -209,11 +199,27 @@ with (compare):
 
         label, left, right = st.columns([label_width, system_one_width, system_two_width])
         with label:
+            st.markdown("Hotwater usage pattern")
+        with left:
+            usage_pattern_one = create_select("Hotwater usage pattern", "Morning and evening only", "one")
+        with right:
+            usage_pattern_two = create_select("Hotwater usage pattern", "Morning and evening only", "two")
+
+        label, left, right = st.columns([label_width, system_one_width, system_two_width])
+        with label:
+            st.markdown("Solar")
+        with left:
+            solar_one = create_select("Solar", True, "one")
+        with right:
+            solar_two = create_select("Solar", True, "two")
+
+        label, left, right = st.columns([label_width, system_one_width, system_two_width])
+        with label:
             st.markdown("Tariff")
         with left:
-            tariff_one = create_select("Tariff", "flat", "one")
+            tariff_one = create_select("Tariff", "Flat rate", "one")
         with right:
-            tariff_two = create_select("Tariff", "CL", "two")
+            tariff_two = create_select("Tariff", "Controlled load", "two")
 
         label, left, right = st.columns([label_width, system_one_width, system_two_width])
         with label:
@@ -227,18 +233,18 @@ with (compare):
         with label:
             st.markdown("Heater control")
         with left:
-            control_one = create_select("Heater control", "GS", "one")
+            control_one = create_select("Heater control", "Run as needed (no control)", "one")
         with right:
-            control_two = create_select("Heater control", "CL3", "two")
+            control_two = create_select("Heater control", "On overnight and sunny hours", "two")
 
-        label, left, right = st.columns([label_width, system_one_width, system_two_width])
-        with label:
-            st.markdown("Solar")
-        with left:
-            solar_one = create_select("Solar", True, "one")
-        with right:
-            solar_two = create_select("Solar", True, "two")
-
+        with st.container():
+            st.info(
+                '''
+                Note: Some Heater/Heater control/Tariff combinations are not available. 
+                If no inputs are returned try adjusting the selected control or tariff option.
+                Read further about the available options in the **Details** tab.
+                '''
+            )
 
     with bar_chart:
 
@@ -246,6 +252,7 @@ with (compare):
             data,
             location_one,
             occupants_one,
+            usage_pattern_one,
             tariff_one,
             heater_one,
             control_one,
@@ -258,6 +265,7 @@ with (compare):
             data,
             location_two,
             occupants_two,
+            usage_pattern_two,
             tariff_two,
             heater_two,
             control_two,
@@ -280,11 +288,29 @@ with (compare):
                 bar_chart, yaxes_title="Net present cost ($)", show_legend=False
             )
 
+            custom_css = """
+            <style>
+                iframe {
+                    height: 25vh !important;
+                }
+                .stPlotlyChart {
+                    height: 25vh !important;
+                }
+                .js-plotly-plot, .plot-container {
+                    height: 25vh !important;
+                }
+            </style>
+            """
+            st.markdown(custom_css, unsafe_allow_html=True)
+
             st.plotly_chart(
                 bar_chart,
                 use_container_width=True,
+                # height=200,
                 key="Net present cost ($)"
             )
+
+
 
         with st.expander("Spending", expanded=False):
 
@@ -326,6 +352,6 @@ with (compare):
             )
 
 with detailed_info:
-    st.markdown("Here we can but detailed notes such as describing solar soaking.")
+    st.markdown("Here we can put detailed notes such as describing solar soaking.")
 
 

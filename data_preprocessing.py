@@ -7,6 +7,7 @@ group_columns = {
     "heater_type": "Heater",
     "control_type": "Heater control",
     "has_solar": "Solar",
+    "profile_HWD": "Hotwater usage pattern",
 }
 
 groups = list(group_columns.values())
@@ -23,18 +24,11 @@ metric_columns = {
 
 metrics = list(metric_columns.values())
 
-other_columns = {
-    "profile_HWD": "Usage profile",
-}
-
-other = list(other_columns.values())
-
 
 def load_and_preprocess_data():
     data = pd.read_csv("all_the_cases.csv")
     data = data.rename(columns=group_columns)
     data = data.rename(columns=metric_columns)
-    data = data.rename(columns=other_columns)
 
     data["Heater"] = data["Heater"].map(
         {
@@ -46,6 +40,38 @@ def load_and_preprocess_data():
         }
     )
 
+    data["Heater control"] = data["Heater control"].map(
+        {
+            "GS": "Run as needed (no control)",
+            "CL1": "On overnight",
+            "CL2": "Off during peak times",
+            "CL3": "On overnight and sunny hours",
+            "timer_SS": "On sunny hours",
+            "diverter": "Active matching to solar",
+            "timer_OP": "On during off-peak TOU"
+        }
+    )
+
+    data["Hotwater usage pattern"] = data["Hotwater usage pattern"].map(
+        {
+            1: "Morning and evening only",
+            2: "Morning and evening with day time",
+            3: "Evenly distributed",
+            4: "Morning",
+            5: "Evening",
+            6: "Late Night",
+        }
+    )
+
+    data["Tariff"] = data["Tariff"].map(
+        {
+            "flat": "Flat rate",
+            "tou": "Time of use (TOU)",
+            "CL": "Controlled load",
+            "gas": "Gas",
+        }
+    )
+
     return data
 
 
@@ -53,6 +79,7 @@ def process_system_data(
         data,
         location,
         occupants,
+        usage_pattern,
         tariff,
         heater,
         control,
@@ -60,6 +87,7 @@ def process_system_data(
 ):
     location_mask = data["Location"] == location
     occupants_mask = data["Household occupants"] == occupants
+    usage_pattern_mask = data["Hotwater usage pattern"] == usage_pattern
     tariff_mask = data["Tariff"] == tariff
     heater_mask = data["Heater"] == heater
     control_mask = data["Heater control"] == control
@@ -68,6 +96,7 @@ def process_system_data(
     mask = (
             location_mask &
             occupants_mask &
+            usage_pattern_mask &
             tariff_mask &
             heater_mask &
             control_mask &
