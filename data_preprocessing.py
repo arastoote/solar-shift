@@ -7,7 +7,7 @@ group_columns = {
     "heater_type": "Heater",
     "control_type": "Heater control",
     "has_solar": "Solar",
-    "profile_HWD": "Hotwater usage pattern",
+    "profile_HWD": "Hot water usage pattern",
 }
 
 groups = list(group_columns.values())
@@ -52,7 +52,7 @@ def load_and_preprocess_data():
         }
     )
 
-    data["Hotwater usage pattern"] = data["Hotwater usage pattern"].map(
+    data["Hot water usage pattern"] = data["Hot water usage pattern"].map(
         {
             1: "Morning and evening only",
             2: "Morning and evening with day time",
@@ -87,7 +87,7 @@ def process_system_data(
 ):
     location_mask = data["Location"] == location
     occupants_mask = data["Household occupants"] == occupants
-    usage_pattern_mask = data["Hotwater usage pattern"] == usage_pattern
+    usage_pattern_mask = data["Hot water usage pattern"] == usage_pattern
     tariff_mask = data["Tariff"] == tariff
     heater_mask = data["Heater"] == heater
     control_mask = data["Heater control"] == control

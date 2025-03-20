@@ -77,9 +77,8 @@ def draw_logo():
     return svg_code
 
 
-def apply_chart_formatting(chart, show_legend=True , yaxes_title=None):
+def apply_chart_formatting(chart, show_legend=True , yaxes_title=None, height=None):
     chart.update_layout(
-        # height=200,
         margin={
             't': 20,
             'b': 20,
@@ -106,3 +105,6 @@ def apply_chart_formatting(chart, show_legend=True , yaxes_title=None):
 
     if not show_legend:
         chart.update_layout(showlegend=False)
+
+    if height:
+        chart.update_layout(height=height)

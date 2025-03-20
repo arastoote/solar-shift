@@ -28,23 +28,29 @@ st.set_page_config(
 st.html("""
     <style>
         .stMainBlockContainer {
-            max-width:80rem;
+            max-width:90vw;
         }
     </style>
     """
 )
 
+st.markdown("""
+<style>
+
+.block-container
+{
+    padding-top: 1rem;
+    padding-bottom: 0rem;
+    margin-top: 1rem;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
 
 @st.cache_data
 def get_data():
     return load_and_preprocess_data()
-
-
-def create_select(group, default, version):
-    options = list(data[group].unique())
-    index = options.index(default)
-    key = f"select-{group}-{version}"
-    return st.selectbox(group, options, index=index, key=key, label_visibility="collapsed")
 
 
 data = get_data()
@@ -86,29 +92,27 @@ with about:
 
 with explore:
 
-    st.markdown(
-        "<h3 style='text-align: center; color: #FFA000;'>Explore hot water system configurations</h1>",
-        unsafe_allow_html=True)
+    with st.container():
+        st.markdown(
+            "<h3 style='text-align: center; color: #FFA000;'>Explore hot water system configurations</h1>",
+            unsafe_allow_html=True)
 
-    top = st.container()
-    middle = st.container()
-    bottom = st.container()
+    with st.container():
 
-    with middle:
+        left, gap, right = st.columns([1.75, 0.25, 5])
 
-        middle_left, middle_middle, middle_right = st.columns([1, 1, 1])
+        with left:
+            st.markdown("<br><br><br>", unsafe_allow_html=True)
 
-        with middle_left:
-            with st.expander("Describe your house"):
+            with st.expander("Describe your house", expanded=False):
                 hs = st.multiselect("Household size", data["Household occupants"].unique(), default=3)
                 locs = st.multiselect("Location", data["Location"].unique())
+                patterns = st.multiselect("Hot water usage pattern", data["Hot water usage pattern"].unique())
                 tariffs = st.multiselect("Tariff", data["Tariff"].unique())
                 solar = st.multiselect("Solar", data["Solar"].unique())
-        with middle_middle:
             with st.expander("Choose a heater"):
                 heater = st.multiselect("Heater type", data["Heater"].unique())
                 control = st.multiselect("Control type", data["Heater control"].unique())
-        with middle_right:
             with st.expander("Compare"):
                 index = groups.index("Heater")
                 x = st.selectbox("Side-by-side", groups, index=index)
@@ -116,44 +120,48 @@ with explore:
                 index = metrics.index("Annual cost ($/yr)")
                 metric = st.selectbox("Comparison metric", metrics, index=index)
 
-        f_data = data.copy()
+            f_data = data.copy()
 
-        if len(hs) > 0:
-            f_data = f_data[f_data["Household occupants"].isin(hs)]
+            if len(hs) > 0:
+                f_data = f_data[f_data["Household occupants"].isin(hs)]
 
-        if len(locs) > 0:
-            f_data = f_data[f_data["Location"].isin(locs)]
+            if len(locs) > 0:
+                f_data = f_data[f_data["Location"].isin(locs)]
 
-        if len(tariffs) > 0:
-            f_data = f_data[f_data["Tariff"].isin(tariffs)]
+            if len(patterns) > 0:
+                f_data = f_data[f_data["Hot water usage pattern"].isin(patterns)]
 
-        if len(solar) > 0:
-            f_data = f_data[f_data["Solar"].isin(solar)]
+            if len(tariffs) > 0:
+                f_data = f_data[f_data["Tariff"].isin(tariffs)]
 
-        if len(control) > 0:
-            f_data = f_data[f_data["Heater control"].isin(control)]
+            if len(solar) > 0:
+                f_data = f_data[f_data["Solar"].isin(solar)]
 
-        if len(heater) > 0:
-            f_data = f_data[f_data["Heater"].isin(heater)]
+            if len(control) > 0:
+                f_data = f_data[f_data["Heater control"].isin(control)]
 
-        show_data = f_data.loc[:,groups + metrics]
+            if len(heater) > 0:
+                f_data = f_data[f_data["Heater"].isin(heater)]
 
-    with top:
+            show_data = f_data.loc[:,groups + metrics]
 
-        chart = px.strip(
-            f_data,
-            y=metric,
-            x=x,
-            color=color
-        )
+        with right:
 
-        chart.update_traces(width=2.0)
+            chart = px.strip(
+                f_data,
+                y=metric,
+                x=x,
+                color=color
+            )
 
-        apply_chart_formatting(chart)
+            chart.update_traces(width=2.0)
 
-        st.plotly_chart(chart, use_container_width=True)
+            apply_chart_formatting(chart)
 
-    with bottom:
+            st.plotly_chart(chart, use_container_width=True)
+
+    with st.container():
+
         table_groups = list(set((x, color)))
         summarise = st.radio("", ["Average", "Show all"])
         if len(table_groups) > 0 and summarise == "Average":
@@ -163,90 +171,44 @@ with explore:
         st.dataframe(show_data.style.format(precision=2), hide_index=True)
 
 with (compare):
+    def create_select(group, default, version):
+        options = list(data[group].unique())
+        index = options.index(default)
+        key = f"select-{group}-{version}"
+        return st.selectbox(group, options, index=index, key=key)
+
     st.markdown(
         "<h3 style='text-align: center; color: #FFA000;'>Compare two hot water systems in detail</h1>",
         unsafe_allow_html=True)
 
-    bar_chart = st.container()
-    system_config = st.container()
-    
-    label_width = 0.5
-    system_one_width = 1
-    system_two_width = 1
+    left, gap, right = st.columns([1.75, 0.25, 5])
 
-    with system_config:
-        label, left, right = st.columns([label_width, system_one_width, system_two_width])
-        with left:
-            st.markdown("System One")
-        with right:
-            st.markdown("System One")
-
-        label, left, right = st.columns([label_width, system_one_width, system_two_width])
-        with label:
-            st.markdown("Location")
-        with left:
+    with left:
+        with st.expander("System one details", expanded=True):
             location_one = create_select("Location", "Sydney", "one")
-        with right:
-            location_two = create_select("Location", "Sydney", "two")
-
-        label, left, right = st.columns([label_width, system_one_width, system_two_width])
-        with label:
-            st.markdown("Household occupants")
-        with left:
             occupants_one = create_select("Household occupants", 3, "one")
-        with right:
-            occupants_two = create_select("Household occupants", 3, "two")
-
-        label, left, right = st.columns([label_width, system_one_width, system_two_width])
-        with label:
-            st.markdown("Hotwater usage pattern")
-        with left:
-            usage_pattern_one = create_select("Hotwater usage pattern", "Morning and evening only", "one")
-        with right:
-            usage_pattern_two = create_select("Hotwater usage pattern", "Morning and evening only", "two")
-
-        label, left, right = st.columns([label_width, system_one_width, system_two_width])
-        with label:
-            st.markdown("Solar")
-        with left:
+            usage_pattern_one = create_select("Hot water usage pattern",
+                                              "Morning and evening only", "one")
             solar_one = create_select("Solar", True, "one")
-        with right:
-            solar_two = create_select("Solar", True, "two")
-
-        label, left, right = st.columns([label_width, system_one_width, system_two_width])
-        with label:
-            st.markdown("Tariff")
-        with left:
-            tariff_one = create_select("Tariff", "Flat rate", "one")
-        with right:
-            tariff_two = create_select("Tariff", "Controlled load", "two")
-
-        label, left, right = st.columns([label_width, system_one_width, system_two_width])
-        with label:
-            st.markdown("Heater")
-        with left:
             heater_one = create_select("Heater", "Heat Pump", "one")
-        with right:
+            tariff_one = create_select("Tariff", "Flat rate", "one")
+            control_one = create_select("Heater control", "Run as needed (no control)",
+                                        "one")
+
+        with st.expander("System two details"):
+            location_two = create_select("Location", "Sydney", "two")
+            occupants_two = create_select("Household occupants", 3, "two")
+            usage_pattern_two = create_select("Hot water usage pattern",
+                                              "Morning and evening only", "two")
+            solar_two = create_select("Solar", True, "two")
             heater_two = create_select("Heater", "Electric", "two")
+            tariff_two = create_select("Tariff", "Flat rate", "two")
+            control_two = create_select("Heater control",
+                                        "Run as needed (no control)",
+                                        "two")
 
-        label, left, right = st.columns([label_width, system_one_width, system_two_width])
-        with label:
-            st.markdown("Heater control")
-        with left:
-            control_one = create_select("Heater control", "Run as needed (no control)", "one")
-        with right:
-            control_two = create_select("Heater control", "On overnight and sunny hours", "two")
 
-        with st.container():
-            st.info(
-                '''
-                Note: Some Heater/Heater control/Tariff combinations are not available. 
-                If no inputs are returned try adjusting the selected control or tariff option.
-                Read further about the available options in the **Details** tab.
-                '''
-            )
-
-    with bar_chart:
+    with right:
 
         system_one_data = process_system_data(
             data,
@@ -259,7 +221,7 @@ with (compare):
             solar_one
         )
 
-        system_one_data["System"] = "One"
+        system_one_data.insert(0, "System", "One")
 
         system_two_data = process_system_data(
             data,
@@ -272,11 +234,11 @@ with (compare):
             solar_two
         )
 
-        system_two_data["System"] = "Two"
+        system_two_data.insert(0, "System", "Two")
 
         system_comparison_data = pd.concat([system_one_data, system_two_data])
 
-        with st.expander("Simple financial comparison", expanded=True):
+        with st.expander("Simple financial comparison", expanded=False):
 
             columns_to_plot = ["Net present cost ($)"]
 
@@ -285,34 +247,16 @@ with (compare):
             )
 
             apply_chart_formatting(
-                bar_chart, yaxes_title="Net present cost ($)", show_legend=False
+                bar_chart, yaxes_title="Net present cost ($)", show_legend=False, height=200
             )
-
-            custom_css = """
-            <style>
-                iframe {
-                    height: 25vh !important;
-                }
-                .stPlotlyChart {
-                    height: 25vh !important;
-                }
-                .js-plotly-plot, .plot-container {
-                    height: 25vh !important;
-                }
-            </style>
-            """
-            st.markdown(custom_css, unsafe_allow_html=True)
 
             st.plotly_chart(
                 bar_chart,
                 use_container_width=True,
-                # height=200,
-                key="Net present cost ($)"
+                key="Net present cost ($)",
             )
 
-
-
-        with st.expander("Spending", expanded=False):
+        with st.expander("Spending", expanded=True):
 
             columns_to_plot = [
                 "Up front cost ($)",
@@ -322,7 +266,7 @@ with (compare):
             ]
 
             bar_chart = px.bar(
-                system_comparison_data, x="System", y=columns_to_plot, barmode="group"
+                system_comparison_data, x="System", y=columns_to_plot, barmode="group", height=200
             )
 
             apply_chart_formatting(bar_chart, yaxes_title="Costs")
@@ -338,7 +282,7 @@ with (compare):
             columns_to_plot = ["CO2 emissions (tons/yr)"]
 
             bar_chart = px.bar(
-                system_comparison_data, x="System", y=columns_to_plot, barmode="group"
+                system_comparison_data, x="System", y=columns_to_plot, barmode="group", height=200
             )
 
             apply_chart_formatting(
@@ -348,7 +292,41 @@ with (compare):
             st.plotly_chart(
                 bar_chart,
                 use_container_width=True,
-                key="Environmental"
+                key="Environmental",
+            )
+
+        with st.expander("Tabular details comparison", expanded=False):
+
+            comp = pd.DataFrame({
+                "Option": ["Location", "Household occupants", "Hot water usage pattern", "Solar", "Heater", "Tariff", "Heater control"],
+                "System one": [location_one, occupants_one, usage_pattern_one, solar_one, heater_one, tariff_one, control_one],
+                "System two": [location_two, occupants_two, usage_pattern_two, solar_two, heater_two, tariff_two, control_two],
+            })
+
+            st.dataframe(comp, hide_index=True)
+
+        with st.expander("Tabular performance comparison", expanded=False):
+
+            column_config = {
+                "Location": None,
+                "Household occupants": None,
+                "Tariff": None,
+                "Heater": None,
+                "Heater control": None,
+                "Solar": None,
+                "Hot water usage pattern": None
+
+            }
+
+            st.dataframe(system_comparison_data, hide_index=True, column_config=column_config)
+
+        with st.container():
+            st.info(
+                '''
+                Note: Some Heater/Heater control/Tariff combinations are not available. 
+                If no inputs are returned try adjusting the selected control or tariff option.
+                Read further about the available options in the **Details** tab.
+                '''
             )
 
 with detailed_info:
