@@ -102,7 +102,7 @@ with explore:
         left, gap, right = st.columns([1.75, 0.25, 5])
 
         with left:
-            st.markdown("<br><br><br>", unsafe_allow_html=True)
+            st.markdown("<br>", unsafe_allow_html=True)
 
             with st.expander("Describe your house", expanded=False):
                 hs = st.multiselect("Household size", data["Household occupants"].unique(), default=3)
