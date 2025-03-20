@@ -77,13 +77,13 @@ with home:
     with b:
         if st.button("Explore a variety of hot water solutions"):
             with st.empty():
-                html(f"<script>{switch(1)}</script>", height=0)
+                html(f"<script>{switch(2)}</script>", height=0)
                 time.sleep(1)
                 html(f"<div></div>", height=0)
     with c:
         if st.button("Compare two hot water solutions side-by-side"):
             with st.empty():
-                html(f"<script>{switch(2)}</script>", height=0)
+                html(f"<script>{switch(3)}</script>", height=0)
                 time.sleep(1)
                 html(f"<div></div>", height=0)
 
