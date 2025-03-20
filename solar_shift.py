@@ -213,7 +213,6 @@ with explore:
 
         # Create the data plot.
         with right:
-
             chart = px.strip(
                 f_data,
                 y=metric,
@@ -334,6 +333,21 @@ with (compare):
             apply_chart_formatting(
                 bar_chart, yaxes_title="Net present cost ($)", show_legend=False, height=200
             )
+
+            custom_css = """
+            <style>
+                iframe {
+                    height: 25vh !important;
+                }
+                .stPlotlyChart {
+                    height: 25vh !important;
+                }
+                .js-plotly-plot, .plot-container {
+                    height: 25vh !important;
+                }
+            </style>
+            """
+            st.markdown(custom_css, unsafe_allow_html=True)
 
             st.plotly_chart(
                 bar_chart,
@@ -554,6 +568,4 @@ with detailed_info:
     show_data = show_data.drop_duplicates(cols)
     show_data = show_data.sort_values(by=cols)
     st.dataframe(show_data, hide_index=True)
-
-
 

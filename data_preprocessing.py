@@ -65,7 +65,6 @@ def load_and_preprocess_data():
             6: "Late Night",
         }
     )
-
     data["Hot water bill type"] = data["Hot water bill type"].map(
         {
             "flat": "Flat rate electricity",

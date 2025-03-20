@@ -133,6 +133,7 @@ def build_icon():
 
 def apply_chart_formatting(chart, show_legend=True , yaxes_title=None, height=None):
     chart.update_layout(
+        # height=200,
         margin={
             't': 20,
             'b': 20,
