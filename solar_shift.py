@@ -427,67 +427,66 @@ with detailed_info:
     
     ### 1.1 Electric
     
-    Electric hot water heater refer to electric tank based systems. Electric hot water
+    Electric hot water heaters refer to electric tank based systems. Electric hot water
     systems use a resistive element similar to those found in an oven to heat a tank of
     hot water. The tank allows the hot water to be heated and then stored, which means
-    these systems can be operated very flexibly, heating when electricity is cheaper 
-    such as overnight, or when solar electricity is available, with the hot water stored 
-    for use later. These systems are very simple and therefore tend to be cheap to 
-    install. Electric hot water heaters can also be pared with a solar electricity 
-    diverter which measures how much electricity is being exported to the grid and 
-    adjust the heater power consumption to match the amount of spare solar electricity. 
-    Diverters add to the cost and complexity of system but can lower electricity bills 
+    these systems can be operated very flexibly, heating when electricity is cheaper, such as overnight, or when solar electricity is available, with the hot water stored 
+    for use later. These systems are very simple and, therefore, are cheap to 
+    install. Electric hot water heaters can also be paired with a solar electricity 
+    diverter, which measures how much electricity is being exported to the grid and 
+    adjusts the heater power consumption to match the amount of spare solar electricity. 
+    Diverters add to the cost and complexity of the system but can lower electricity bills 
     and carbon emissions.  
     
     ### 1.2 Heat pump
     
-    Heat pumps use the same technology found in fridges and air conditions to suck heat 
+    Heat pumps use the same technology found in fridges and air conditioners to suck heat 
     out of the air and pump it into water. As the heat comes from the air rather than
-    directly from electricity they typically use much less energy than simple electric 
+    directly from electricity, they typically use much less energy than simple electric 
     hot water heaters. However, similar to an electric hot water heater, they use a tank 
-    to store the hot water, so can be run on flexible schedule when electricity is 
+    to store the hot water, so it can be run flexibly when electricity is 
     cheaper, such as overnight or during the day when solar electricity is available. 
     Heat pumps tend to be more expensive to buy but cheaper to run than simple electric 
     hot water systems.
     
     ### 1.3 Gas instant
     
-    Instantaneous gas hot water system turn on only when you turn on your hot water tap, 
-    heating the water on demand as it is needed. They tend to be cheap to install with a
+    Instantaneous gas hot water systems turn on only when you turn on your hot water tap, 
+    heating the water on demand as it is needed. They tend to be cheap to install and have a
     moderate running cost. However, there isn't any scope to reduce emissions or lower
-    running cost by combing this type hot water system with utilising solar electricity.
+    running costs by combining this type of hot water system with solar electricity.
     
     ### 1.4 Gas storage
     
-    Gas storage system use gas to heat the hot water which is then stored in a tank. 
-    These systems tend to be bit more expensive to install and run compared to 
+    Gas storage systems use gas to heat the hot water, which is then stored in a tank. 
+    These systems tend to be a bit more expensive to install and run compared to 
     instantaneous gas.
     
     ### 1.5 Solar thermal
     
-    Solar thermal systems use the sun to directly heat the water which is then stored in
-    a tank for later use. In the Solar Shift project we also assumed that the Solar 
-    thermal systems had an electric booster that heated the hot water tank when it's
+    Solar thermal systems use the sun to heat the water directly, which is then stored in
+    a tank for later use. In the Solar Shift project, we also assumed that the Solar 
+    thermal systems had an electric booster that heated the hot water tank when its
     temperature dropped below a preset temperature. Solar thermal systems tend to be 
     expensive to install and relatively cheap to run. Additionally, because the sun is 
-    being used to heat the water directly they useless roof space than required by solar 
-    electricity systems. However, the complexity of running water pipes on an off your 
-    roof, as well as the pumps for required for some systems is an additional 
+    being used to heat the water directly, they use less roof space than is required by solar 
+    electricity systems. However, the complexity of running water pipes on and off your 
+    roof, as well as the pumps needed for some systems is an additional 
     consideration.
     
     ## 2. Hot water control
     
-    Some hot water system can be controlled such they use electricity when it is cheaper 
-    or when solar electricity is available to be used. The various control strategies 
+    Some hot water systems can be controlled so they use electricity when it is cheaper 
+    or when solar electricity is available. The various control strategies 
     explored in the Solar Shift simulations are described below.
     
     ### 2.1 Run as needed (no control)
     
-    Run as needed means the hot water system will just run as per its own internal 
-    control system. For Electric, Heat pump, and Gas storage this mean the heater will
-    run when the water in the tank falls below a preset temperature. For Gas Instant 
-    this the heater will run when hot water is being used. For Solar thermal the heater
-    will run when the sun is shining and when the temperature drops below a preset 
+    Run as needed means the hot water system will just run as per its internal 
+    control system. For Electric, Heat pump, and Gas storage, this means the heater will
+    run when the water in the tank falls below a preset temperature. For Gas Instant, 
+    the heater will run when hot water is used. For Solar thermal the heater
+    will run when the sun is shining or the temperature drops below a preset 
     value.
     
     ### 2.2. Off during peak usage times
@@ -526,18 +525,18 @@ with detailed_info:
     
     ### 2.7 Active matching to solar
     
-    This control options means the water heater runs when there is spare solar 
+    This control option means the water heater runs when there is spare solar 
     electricity being exported to the grid. The control option is only available for 
     Electric heaters with the 'Flat rate electricity' or 'Controlled load discount 
     electricity' bill type.
     
     ## 3. Options explored
     
-    Not all system configurations have been modelled. Typically, where system 
+    Not all system configurations have been modelled. Typically, when system 
     configurations have not been modelled this is because the configuration does not 
-    make sense from a technical perspective e.g. it does not make sense to model a Gas
-    storage heater with and Flate rate electricity bill type. The complete set of 
-    configurations that have been modelled are show in the table below.
+    make sense from a technical perspective, e.g. it does not make sense to model a Gas
+    storage heater with a Flat rate electricity bill type. The complete set of 
+    configurations that have been modelled are shown in the table below.
     """
     )
     cols = ["Heater", "Heater control", "Hot water bill type", "Solar"]
