@@ -3,7 +3,7 @@ import pandas as pd
 group_columns = {
     "location": "Location",
     "household_size": "Household occupants",
-    "tariff_type": "Tariff",
+    "tariff_type": "Hot water bill type",
     "heater_type": "Heater",
     "control_type": "Heater control",
     "has_solar": "Solar",
@@ -17,7 +17,7 @@ metric_columns = {
     "capital_cost": "Up front cost ($)",
     "rebates": "Rebates ($)",
     "annual_energy_cost": "Annual cost ($/yr)",
-    "annual_fit_opp_cost": "Annual lost FiT revenue ($/yr)",
+    "annual_fit_opp_cost": "Decrease in solar export revenue ($/yr)",
     "emissions_total": "CO2 emissions (tons/yr)",
     "annual_energy_consumption": "Annual energy consumption (kWh)"
 }
@@ -26,6 +26,9 @@ metrics = list(metric_columns.values())
 
 
 def load_and_preprocess_data():
+    """Reads hotwater simulation results from CSVs and renames columns and values to
+    more user-friendly conventions.
+    """
     data = pd.read_csv("all_the_cases.csv")
     data = data.rename(columns=group_columns)
     data = data.rename(columns=metric_columns)
@@ -44,11 +47,11 @@ def load_and_preprocess_data():
         {
             "GS": "Run as needed (no control)",
             "CL1": "On overnight",
-            "CL2": "Off during peak times",
+            "CL2": "Off during peak billing times",
             "CL3": "On overnight and sunny hours",
             "timer_SS": "On sunny hours",
             "diverter": "Active matching to solar",
-            "timer_OP": "On during off-peak TOU"
+            "timer_OP": "On during off-peak billing times"
         }
     )
 
@@ -63,12 +66,19 @@ def load_and_preprocess_data():
         }
     )
 
-    data["Tariff"] = data["Tariff"].map(
+    data["Hot water bill type"] = data["Hot water bill type"].map(
         {
-            "flat": "Flat rate",
-            "tou": "Time of use (TOU)",
-            "CL": "Controlled load",
-            "gas": "Gas",
+            "flat": "Flat rate electricity",
+            "tou": "Time varying rate electricity",
+            "CL": "Controlled load discount electricity",
+            "gas": "Flat rate gas",
+        }
+    )
+
+    data["Solar"] = data["Solar"].map(
+        {
+            True: "Yes",
+            False: "No",
         }
     )
 
@@ -88,7 +98,7 @@ def process_system_data(
     location_mask = data["Location"] == location
     occupants_mask = data["Household occupants"] == occupants
     usage_pattern_mask = data["Hot water usage pattern"] == usage_pattern
-    tariff_mask = data["Tariff"] == tariff
+    tariff_mask = data["Hot water bill type"] == tariff
     heater_mask = data["Heater"] == heater
     control_mask = data["Heater control"] == control
     solar_mask = data["Solar"] == solar
@@ -104,10 +114,6 @@ def process_system_data(
     )
 
     data = data.loc[mask, :]
-
-    agg_dict = {col: "mean" for col in metrics}
-
-    data = data.groupby(groups, as_index=False).agg(agg_dict)
 
     return data
 
