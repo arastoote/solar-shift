@@ -41,8 +41,8 @@ To run the app on your machine use the following command line steps:
 
 # App architecture 
 
-   - **streamlit.py**: Most of the code for the webapp is located in the file 
-     streamlit.py. With the five tabs of the web defined sequential in the file.
+   - **solar_shift.py**: Most of the code for the webapp is located in the file 
+     solar_shift.py. With the five tabs of the web defined sequential in the file.
    - **data_preprocessing.py**: Before the data is used directly in the webapp it is 
      loaded from the csv into pd.DataFrame and reformatted in the function 
      load_and_preprocess_data defined in the file data_preprocessing.py
