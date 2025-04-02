@@ -15,7 +15,7 @@ https://docs.streamlit.io/get-started
 
 # Running the app on a local machine
 
-To run the app on your machine use the following steps:
+To run the app on your machine use the following command line steps:
 
 1. install the `uv` python package manager
 
