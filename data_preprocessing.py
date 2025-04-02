@@ -29,7 +29,7 @@ def load_and_preprocess_data():
     """Reads hotwater simulation results from CSVs and renames columns and values to
     more user-friendly conventions.
     """
-    data = pd.read_csv("all_the_cases.csv")
+    data = pd.read_csv("hotwater_data.csv")
     data = data.rename(columns=group_columns)
     data = data.rename(columns=metric_columns)
 

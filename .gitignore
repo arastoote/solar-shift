@@ -172,3 +172,7 @@ cython_debug/
 
 # Project
 solar-shift.code-workspace
+
+uv.lock
+*.csv
+graphics.py
