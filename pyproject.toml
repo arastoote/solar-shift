@@ -9,5 +9,6 @@ dependencies = [
     "matplotlib>=3.10.1",
     "pandas>=2.2.3",
     "plotly>=6.0.0",
+    "streamlit-extras>=0.6.0",
     "streamlit>=1.43.0",
 ]

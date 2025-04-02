@@ -1,4 +1,5 @@
 import streamlit as st
+from streamlit_extras.stylable_container import stylable_container
 from streamlit.components.v1 import html
 import pandas as pd
 import plotly.express as px
@@ -31,7 +32,7 @@ st.set_page_config(
 st.html("""
     <style>
         .stMainBlockContainer {
-            max-width:90vw;
+            max-width: 90vw;
         }
     </style>
     """
@@ -43,6 +44,7 @@ st.markdown("""
 
 .block-container
 {
+    max-width: 1300px;
     padding-top: 1rem;
     padding-bottom: 0rem;
     margin-top: 1rem;
@@ -88,15 +90,23 @@ with home:
     st.markdown(draw_logo(), unsafe_allow_html=True)
 
     # Columns to space buttons out.
-    a, b, c, d = st.columns([0.4, 1, 1, 0.4])
+    a, b, c, d = st.columns([0.3, 1, 1, 0.4])
 
     # Button to take user to the Explore tab.
     with b:
-        if st.button("Explore a variety of hot water solutions"):
-            with st.empty():
-                html(f"<script>{switch(2)}</script>", height=0)
-                time.sleep(1)
-                html(f"<div></div>", height=0)
+        with stylable_container(
+                key="Upload_Data",
+                css_styles="""
+                    button{
+                        float: right;
+                    }
+                    """
+        ):
+            if st.button("Explore a variety of hot water solutions"):
+                with st.empty():
+                    html(f"<script>{switch(2)}</script>", height=0)
+                    time.sleep(1)
+                    html(f"<div></div>", height=0)
 
     # Button to take user to the Compare tab.
     with c:
