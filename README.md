@@ -27,23 +27,31 @@ To run the app on your machine use the following steps:
 
     ```
     powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-   ```
+    ```
 
    MacOS and Linux:
 
-   ```curl -LsSf https://astral.sh/uv/install.sh | sh```
+   ```
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+   ```
 
 3. use `uv` to install python 3.12 if you don't already have it:
 
-   ```uv python install 3.12```
+   ```
+   uv python install 3.12
+   ```
 
 4. use `uv` to install the solar-shift web app dependencies:
 
-   ```uv sync```
+   ```
+   uv sync
+   ```
 
 5. use `uv` to run the webapp locally:
 
-   ```uv run streamlit run solar_shift.py```
+   ```
+   uv run streamlit run solar_shift.py
+   ```
 
 # App architecture 
 
