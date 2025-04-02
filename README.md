@@ -1,10 +1,11 @@
 # Solar-shift streamlit app
 
-This repository contains the source code for the solar-shift streamlit web app.
+This repository contains the source code for the solar-shift streamlit webapp.
 
-The app is designed to make the results of the SolarShift project accessible to 
-consumers to help inform their hot water heater purchasing decisions. More information 
-on the project can be found here: https://www.ceem.unsw.edu.au/our-research/solarshift.
+The webapp is designed to make the results of the SolarShift project accessible to 
+consumers to help inform their hot water heater purchasing and operating decisions. 
+More information on the project can be found here: 
+https://www.ceem.unsw.edu.au/our-research/solarshift.
 
 # App technology
 
@@ -15,39 +16,44 @@ https://docs.streamlit.io/get-started
 
 # Running the app on a local machine
 
-To run the app on your machine use the following command line steps:
+To run the app on your machine use the following steps:
 
-1. install the `uv` python package manager
+1. Clone this repository to your local machine. Then complete steps 2-5 in the 
+   command line inside the repository directory.
+
+2. install the `uv` python package manager
 
    Windows:
 
-    `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"`
+    ```powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"```
 
    MacOS and Linux:
 
-   `curl -LsSf https://astral.sh/uv/install.sh | sh`
+   ```curl -LsSf https://astral.sh/uv/install.sh | sh```
 
-2. use `uv` to install python 3.12 if you don't already have it:
+3. use `uv` to install python 3.12 if you don't already have it:
 
-   `uv python install 3.12`
+   ```uv python install 3.12```
 
-3. use `uv` to install the solar-shift web app dependencies:
+4. use `uv` to install the solar-shift web app dependencies:
 
-   `uv sync`
+   ```uv sync```
 
-4. use `uv` to run the webapp locally:
+5. use `uv` to run the webapp locally:
 
-   `uv run streamlit run solar_shift.py`
+   ```uv run streamlit run solar_shift.py```
 
 # App architecture 
 
    - **solar_shift.py**: Most of the code for the webapp is located in the file 
-     solar_shift.py. With the five tabs of the web defined sequential in the file.
+     solar_shift.py. With the five tabs of the webapp defined sequential in the file.
+   - ***hotwater_data.csv***: The data displayed in the webapp is stored in 
+     hotwater_data.csv.
    - **data_preprocessing.py**: Before the data is used directly in the webapp it is 
-     loaded from the csv into pd.DataFrame and reformatted in the function 
-     load_and_preprocess_data defined in the file data_preprocessing.py
+     loaded from hotwater_data.csv into a pd.DataFrame and reformatted in the function 
+     load_and_preprocess_data, which is defined in the file data_preprocessing.py
    - **graphics.py**: The code for drawing the image on the home page, the website icon
-      and apply chart formatting are in the file graphics.py
+      and applying chart formatting is in the file graphics.py
    - **pyproject.toml**: The project dependencies are defined in pyproject.toml.
 
 # Upkeep and maintenance 
