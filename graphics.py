@@ -1,4 +1,3 @@
-from cairosvg import svg2png
 
 def draw_logo():
     svg_code = """
@@ -79,6 +78,10 @@ def draw_logo():
 
 
 def build_icon():
+
+    # Put import here so streamlit server does not try and import and crash
+    from cairosvg import svg2png
+
     svg_code = """
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
       <!-- Transparent background -->
