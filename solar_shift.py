@@ -334,21 +334,6 @@ with (compare):
                 bar_chart, yaxes_title="Net present cost ($)", show_legend=False, height=200
             )
 
-            custom_css = """
-            <style>
-                iframe {
-                    height: 25vh !important;
-                }
-                .stPlotlyChart {
-                    height: 25vh !important;
-                }
-                .js-plotly-plot, .plot-container {
-                    height: 25vh !important;
-                }
-            </style>
-            """
-            st.markdown(custom_css, unsafe_allow_html=True)
-
             st.plotly_chart(
                 bar_chart,
                 use_container_width=True,
