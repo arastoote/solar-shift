@@ -54,6 +54,11 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
+# Create the tabs of the webpage.
+home, about, explore, compare, detailed_info = \
+    st.tabs(["Home", "About", "Explore", "Compare", "Details"])
+
+
 # Wrap the data loading function in a function with streamlit caching enabled. This way
 # the function is only run once when the app is launched.
 @st.cache_data
@@ -62,11 +67,6 @@ def get_data():
 
 
 data = get_data()
-
-# Create the tabs of the webpage.
-home, about, explore, compare, detailed_info = \
-    st.tabs(["Home", "About", "Explore", "Compare", "Details"])
-
 
 # Create a function that allows the two buttons at the bottom of the homepage to take
 # the user to another tab.
