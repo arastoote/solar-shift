@@ -50,37 +50,36 @@ To run the app on your machine use the following steps:
 5. use `uv` to run the webapp locally:
 
    ```
-   uv run streamlit run app.py
+   uv run streamlit run solar_shift.py
    ```
 
 # App architecture 
 
-   - **app.py**: The main application file that sets up the Streamlit app structure and orchestrates the different tabs.
-   - **tabs/**: This directory contains individual Python files for each tab in the application (Home, About, Explore, Compare, Details). Each file contains a `render` function responsible for displaying the content of that tab.
-   - **data/**: This directory holds the data used by the application.
-     - ***hotwater_data.csv***: The core data displayed in the webapp.
-   - **data_processing/**: Contains modules related to loading and processing the data.
-     - **data_processing.py**: Handles loading data from `hotwater_data.csv` and reformatting it for use in the app.
-   - **graphics/**: Contains modules related to visual elements.
-     - **visuals.py**: Includes functions for drawing the logo on the home page and loading images.
-     - **images.py**: Function for applying consistent formatting to charts.
-   - **images/**: Contains static image files used by the app (e.g., favicon, usage patterns chart).
-   - **pyproject.toml**: Defines project dependencies managed by `uv`.
+   - **solar_shift.py**: Most of the code for the webapp is located in the file 
+     solar_shift.py. With the five tabs of the webapp defined sequential in the file.
+   - ***hotwater_data.csv***: The data displayed in the webapp is stored in 
+     hotwater_data.csv.
+   - **data_preprocessing.py**: Before the data is used directly in the webapp it is 
+     loaded from hotwater_data.csv into a pd.DataFrame and reformatted in the function 
+     load_and_preprocess_data, which is defined in the file data_preprocessing.py
+   - **graphics.py**: The code for drawing the image on the home page, the website icon
+      and applying chart formatting is in the file graphics.py
+   - **pyproject.toml**: The project dependencies are defined in pyproject.toml.
 
 # Upkeep and maintenance 
 
 ## Updating the results data
 
-- The data the webapp displays can be updated by changing the `data/hotwater_data.csv` file. 
+- The data the webapp displays can be updated by changing the `hotwater_data.csv` file. 
   If the naming conventions are kept the same the webapp code should not need to be 
   modified.
 
 - If new parameter columns are added to the data then the web app may need to be 
-  updated in several places, including in `data_processing/data_processing.py`, and anywhere widgets 
-  for filter or aggregating data are defined (primarily within the `tabs/` directory).
+  updated in several places, including in data_preprocessing.py, and anywhere widgets 
+  for filter or aggregating data are defined.
 
-- If data naming conventions are changed, then `data_processing/data_processing.py` and anywhere a data
-  column is referenced (primarily within the `tabs/` directory) may need to be updated.
+- If data naming conventions are changed, then data_preprocessing.py and anywhere a data
+  column is referenced in solar_shift.py may need to be updated.
 
 ## Webapp hosting
 
