@@ -172,3 +172,5 @@ cython_debug/
 
 # Project
 solar-shift.code-workspace
+
+*.cursor/
