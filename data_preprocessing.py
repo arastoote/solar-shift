@@ -3,7 +3,7 @@ import pandas as pd
 group_columns = {
     "location": "Location",
     "household_size": "Household occupants",
-    "tariff_type": "Hot water bill type",
+    "tariff_type": "Hot water billing type",
     "heater_type": "Heater",
     "control_type": "Heater control",
     "has_solar": "Solar",
@@ -60,12 +60,12 @@ def load_and_preprocess_data():
             1: "Morning and evening only",
             2: "Morning and evening with day time",
             3: "Evenly distributed",
-            4: "Morning",
-            5: "Evening",
+            4: "Morning dominant",
+            5: "Evening dominant",
             6: "Late Night",
         }
     )
-    data["Hot water bill type"] = data["Hot water bill type"].map(
+    data["Hot water billing type"] = data["Hot water billing type"].map(
         {
             "flat": "Flat rate electricity",
             "tou": "Time varying rate electricity",
@@ -97,7 +97,7 @@ def process_system_data(
     location_mask = data["Location"] == location
     occupants_mask = data["Household occupants"] == occupants
     usage_pattern_mask = data["Hot water usage pattern"] == usage_pattern
-    tariff_mask = data["Hot water bill type"] == tariff
+    tariff_mask = data["Hot water billing type"] == tariff
     heater_mask = data["Heater"] == heater
     control_mask = data["Heater control"] == control
     solar_mask = data["Solar"] == solar

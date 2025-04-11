@@ -153,27 +153,27 @@ with explore:
                 patterns = st.multiselect(
                     "Hot water usage pattern",
                     data["Hot water usage pattern"].unique(),
-                    help="When hot water typically used in the house."
+                    help="When hot water is typically used in the house."
                 )
                 tariffs = st.multiselect(
-                    "Hot water bill type",
-                    data["Hot water bill type"].unique(),
+                    "Hot water billing type",
+                    data["Hot water billing type"].unique(),
                     help="""
                     How energy used for heating hot water is paid for. 
                     
                     This needs to match with the Heater type options
                     selected and the Control type options. E.g. to view 
-                    gas heater options, gas also needs to be a bill type
-                    option. Similarly, to use Control Type options that
+                    gas heater options, gas also needs to be the billing type
+                    option. Similarly, to use Control type options that
                     restrict when the heater is run the 
-                    'Control load discount electricity' needs to be an
-                    option.
+                    'Control load discount electricity' needs to be the billing
+                    type.
                     """
                 )
                 solar = st.multiselect(
                     "Solar",
                     data["Solar"].unique(),
-                    help="If the house has a Solar electricity system."
+                    help="If the house has a solar electricity system."
                 )
             with st.expander("Choose a heater"):
                 heater = st.multiselect("Heater type", data["Heater"].unique())
@@ -199,7 +199,7 @@ with explore:
             if len(patterns) > 0:
                 f_data = f_data[f_data["Hot water usage pattern"].isin(patterns)]
             if len(tariffs) > 0:
-                f_data = f_data[f_data["Hot water bill type"].isin(tariffs)]
+                f_data = f_data[f_data["Hot water billing type"].isin(tariffs)]
             if len(solar) > 0:
                 f_data = f_data[f_data["Solar"].isin(solar)]
             if len(control) > 0:
@@ -269,7 +269,7 @@ with (compare):
                                               "Morning and evening only", "one")
             solar_one = create_select("Solar", "Yes", "one")
             heater_one = create_select("Heater", "Heat Pump", "one")
-            tariff_one = create_select("Hot water bill type", "Flat rate electricity", "one")
+            tariff_one = create_select("Hot water billing type", "Flat rate electricity", "one")
             control_one = create_select("Heater control", "Run as needed (no control)",
                                         "one")
 
@@ -281,7 +281,7 @@ with (compare):
                                               "Morning and evening only", "two")
             solar_two = create_select("Solar", "Yes", "two")
             heater_two = create_select("Heater", "Electric", "two")
-            tariff_two = create_select("Hot water bill type", "Flat rate electricity", "two")
+            tariff_two = create_select("Hot water billing type", "Flat rate electricity", "two")
             control_two = create_select("Heater control",
                                         "Run as needed (no control)",
                                         "two")
@@ -385,7 +385,7 @@ with (compare):
         with st.expander("Tabular details comparison", expanded=False):
 
             comp = pd.DataFrame({
-                "Option": ["Location", "Household occupants", "Hot water usage pattern", "Solar", "Heater", "Hot water bill type", "Heater control"],
+                "Option": ["Location", "Household occupants", "Hot water usage pattern", "Solar", "Heater", "Hot water billing type", "Heater control"],
                 "System one": [location_one, str(occupants_one), usage_pattern_one, solar_one, heater_one, tariff_one, control_one],
                 "System two": [location_two, str(occupants_two), usage_pattern_two, solar_two, heater_two, tariff_two, control_two],
             })
@@ -399,7 +399,7 @@ with (compare):
             column_config = {
                 "Location": None,
                 "Household occupants": None,
-                "Hot water bill type": None,
+                "Hot water billing type": None,
                 "Heater": None,
                 "Heater control": None,
                 "Solar": None,
@@ -428,10 +428,97 @@ with detailed_info:
     
     ## Contents
     
+    1. [Methodology](#methodology)
     1. [Hot water heaters](#hot-water-heaters)
+    1. [billing types (tariffs)](#billing-types)
     1. [Hot water control](#hot-water-control)
+    1. [Hot water usage patterns](#hot-water-usage-patterns)
     1. [Options explored](#options-explored)
-    
+                
+    ## Methodology
+                
+    Hot water system performance was calculated using a two stage methodology. In 
+    the first stage a thermal simulation of the hot water system is performed and 
+    in the second stage the cost of operating the system is determined.
+                
+    ### Thermal simulation
+                
+    The thermal simulation of the hot water systems dynamically simulated the 
+    temperature in the hot water storage tank and the system's use of 
+    electricity or gas. Taking into account the:
+                
+    - Usage of hot water by the house, according to the selected hot water 
+        usage pattern,
+    - The thermal properties of the hot water tank (e.g. insulation)
+    - Energy obtained from solar hot water heating panels (solar 
+        thermal systems only)
+    - The heating of the hot water when the temperature fell below the
+        thermostate turn on set point
+    - The efficiency of the heater, how much energy from electricity or gas
+        it requires to heat water
+    - Note, instantaneous gas systems do not have tanks, so only the energy
+        required to directly heat the water as needed is considered.
+            
+    The key output of these simulations is the time varying energy (gas or
+    electrcity) usage across the year.
+                
+    ### Financial cost
+                
+    Once a hot water heater's time varying energy usage had been 
+    calculated then the cost of operating the heater was determined. For
+    electric, heat pump, and solar thermal systems the following method
+    was used to calculate the operating cost. For each half hourly period
+    in the energy usage results:
+            
+    1. The cost of heating using electricity from the households solar system
+    was determined. If solar electricity was available this was used preferentially
+    with an assumed cost equal to solar export payment rate (feed in tariff). 
+    The solar export payment rate was applied as a cost because when solar
+    electricity was used to heat hot water the household loses the revenue that
+    they would otherwise have obtained from exporting.
+    2. The cost of heating using grid electrity is determined. Any energy 
+    required to heat the hot water that cannot not be provided from solar
+    electricity must be imported from the electricity grid. The cost of this
+    electricity was determined by the billing type (tariff) selected. For time 
+    varying billing types this rate can change throughout the day and year. For
+    flate rate and controlled load billing types this rate is constant throughout the
+    year.
+    3. The cost of heating from solar and from the grid for the half hourly period
+    is added together to give the total cost for the period.
+                
+    Then the cost of heating for a year is determined by summing the costs 
+    for all periods in the year. Note, no fixed daily charges are considered 
+    for electricity as household must pay these regardless of their heater 
+    type or total usage. 
+            
+    For gas hot water systems the cost was simply calculated by mutipling the
+    total gas usage by fixed rate for gas.
+                
+    ### Environmental cost
+                
+    For electric, heat pump, and solar hot water the environemental cost in tons of 
+    CO2 per year is also calaculated on a time varying basis. 
+    For each half hourly period in the year the volume of electricity not met by the 
+    households solar was multiplied by the carbon intensity of grid at that time to give the
+    CO2 emissions assocaited with using hot water at that time. Then the emissions for all
+    half hourly periods across the year were summed to give the total emissions per year.
+                
+    For gas hot water systems the yearly emssions was simply calculated by mutipling the
+    total gas usage by the emissions intensity of gas.
+                
+    ## Billing type
+                
+    The billing type, or tariff, determines how the household is charged for electricity
+    or gas use. There are three types of billing that considered in the Solar Shift analysis:
+                
+    1. Flate rate electricity/gas: here a fixed rate for electricity or gas is charged 
+    regardless of when it is used. 
+    2. Controlled load discount electricity: a fixed rate is also used for controlled 
+    load, but a lower rate is charged because the load is typically shifted to times when the cost 
+    is lower for grid to supply energy to the household.
+    3. Time varying rate electricity: here the rate charged for electricity depends on the
+    time of use.
+                
     ## 1. Hot water heaters
     
     ### 1.1 Electric
@@ -502,34 +589,34 @@ with detailed_info:
     
     This control option means the water heater is restricted from running during local 
     peak electricity usage times. The control option is only available for Electric and 
-    Heat pump hot water heaters and with the 'Controlled load discount electricity' bill
+    Heat pump hot water heaters and with the 'Controlled load discount electricity' billing
     type.
     
     ### 2.3 On during off-peak billing times
     
     This control option means the water heater can only run during off-peak billing 
-    times (as defined in time varying electricity bill). The control option is only 
+    times (as defined in time varying electricity billing). The control option is only 
     available for Electric and Heat pump hot water heaters and with the 
-    'Time varying rate electricity' bill type.
+    'Time varying rate electricity' billing type.
     
     ### 2.4 On overnight
     
     This control option means the water heater can only run overnight. The control 
     option is only available for Electric and Heat pump hot water heaters and with the 
-    'Controlled load discount electricity' bill type.
+    'Controlled load discount electricity' billing type.
     
     ### 2.5 On overnight and sunny hours
     
     This control option means the water heater can only run overnight and during periods
     of the day that are typically sunny. The control option is only available for 
     Electric and Heat pump hot water heaters and with the 'Controlled load discount 
-    electricity' bill type.
+    electricity' billing type.
     
     ### 2.6 On sunny hours
     
     This control option means the water heater can only run during periods
     of the day that are typically sunny. The control option is only available for 
-    Electric and Heat pump hot water heaters and with the 'Flat rate electricity' bill 
+    Electric and Heat pump hot water heaters and with the 'Flat rate electricity' billing 
     type.
     
     ### 2.7 Active matching to solar
@@ -537,18 +624,27 @@ with detailed_info:
     This control option means the water heater runs when there is spare solar 
     electricity being exported to the grid. The control option is only available for 
     Electric heaters with the 'Flat rate electricity' or 'Controlled load discount 
-    electricity' bill type.
+    electricity' billing type.
+                
+    ## Hot water usage pattern
+                
+    Hot water heating was simulated with a number of different hot water usage patterns.
+    The user can choose the one that best matches their own usage pattern or consider
+    how a hot water system might peform across a several patterns if they are unsure
+    which one best matches them.
+                    
+    ![Hot water usage patterns](/usage_patterns.png)
     
     ## 3. Options explored
     
     Not all system configurations have been modelled. Typically, when system 
     configurations have not been modelled this is because the configuration does not 
     make sense from a technical perspective, e.g. it does not make sense to model a Gas
-    storage heater with a Flat rate electricity bill type. The complete set of 
+    storage heater with a Flat rate electricity billing type. The complete set of 
     configurations that have been modelled are shown in the table below.
     """
     )
-    cols = ["Heater", "Heater control", "Hot water bill type", "Solar"]
+    cols = ["Heater", "Heater control", "Hot water billing type", "Solar"]
     show_data = data.loc[:, cols]
     show_data = show_data.drop_duplicates(cols)
     show_data = show_data.sort_values(by=cols)
