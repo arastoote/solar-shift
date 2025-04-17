@@ -2,7 +2,6 @@ import time
 
 import streamlit as st
 from streamlit.components.v1 import html
-from streamlit_js_eval import streamlit_js_eval
 
 
 def switch(tab):
