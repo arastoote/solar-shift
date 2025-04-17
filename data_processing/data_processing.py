@@ -1,5 +1,6 @@
 import pandas as pd
 
+
 group_columns = {
     "location": "Location",
     "household_size": "Household occupants",
@@ -81,37 +82,9 @@ def load_and_preprocess_data():
         }
     )
 
+    # Add in gas for household with solar pv.
+    gas_data = data[data["Heater"].isin(["Gas Storage", "Gas Instant"])].copy()
+    gas_data["Solar"] = "Yes"
+    data = pd.concat([data, gas_data])
+
     return data
-
-
-def process_system_data(
-        data,
-        location,
-        occupants,
-        usage_pattern,
-        tariff,
-        heater,
-        control,
-        solar
-):
-    location_mask = data["Location"] == location
-    occupants_mask = data["Household occupants"] == occupants
-    usage_pattern_mask = data["Hot water usage pattern"] == usage_pattern
-    tariff_mask = data["Hot water billing type"] == tariff
-    heater_mask = data["Heater"] == heater
-    control_mask = data["Heater control"] == control
-    solar_mask = data["Solar"] == solar
-
-    mask = (
-            location_mask &
-            occupants_mask &
-            usage_pattern_mask &
-            tariff_mask &
-            heater_mask &
-            control_mask &
-            solar_mask
-    )
-
-    data = data.loc[mask, :]
-
-    return data 

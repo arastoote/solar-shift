@@ -1,4 +1,5 @@
 version = 1
+revision = 1
 requires-python = ">=3.12"
 
 [[package]]
@@ -167,7 +168,7 @@ name = "click"
 version = "8.1.8"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "platform_system == 'Windows'" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/b9/2e/0090cbf739cee7d23781ad4b89a9894a41538e4fcf4c31dcdd705b78eb8b/click-8.1.8.tar.gz", hash = "sha256:ed53c9d8990d83c2a27deae68e4ee337473f6330c040a31d4225c9574d16096a", size = 226593 }
 wheels = [
@@ -975,6 +976,7 @@ dependencies = [
     { name = "plotly" },
     { name = "streamlit" },
     { name = "streamlit-extras" },
+    { name = "streamlit-scroll-to-top" },
 ]
 
 [package.metadata]
@@ -985,6 +987,7 @@ requires-dist = [
     { name = "plotly", specifier = ">=6.0.0" },
     { name = "streamlit", specifier = ">=1.43.0" },
     { name = "streamlit-extras", specifier = ">=0.6.0" },
+    { name = "streamlit-scroll-to-top", specifier = ">=0.0.4" },
 ]
 
 [[package]]
@@ -1042,7 +1045,7 @@ dependencies = [
     { name = "toml" },
     { name = "tornado" },
     { name = "typing-extensions" },
-    { name = "watchdog", marker = "platform_system != 'Darwin'" },
+    { name = "watchdog", marker = "sys_platform != 'darwin'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/02/05/7b0a78beb4589fa056435fdf2243bc28ba3b320f4bc54b2cbf7680d7848b/streamlit-1.43.0.tar.gz", hash = "sha256:c10c09f9d1251fa7f975dd360572f03cabc82b174f080e323bf7e556103c22e0", size = 9344982 }
 wheels = [
@@ -1167,6 +1170,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/88/25/d153babd6d8dff72ee2e56976862ec7fdd7856ec7da2cb6ffd4b3b12f336/streamlit_keyup-0.3.0.tar.gz", hash = "sha256:8595a14892423243669e5d50e982853ffb7eb201b65952a48676133ab9bbc937", size = 7387 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/14/ed/facce225c0d360b9bfa053c827029312e1b255e84d79320bda3539417b50/streamlit_keyup-0.3.0-py3-none-any.whl", hash = "sha256:ec7221617b1c832526db52859196c417578d6b4285942fbd10a0b2ff313899b3", size = 7493 },
+]
+
+[[package]]
+name = "streamlit-scroll-to-top"
+version = "0.0.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "streamlit" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/d2/06/26f13270ea77f0fddec15b11955dad1c1130897c87f6a4c3040221051ef7/streamlit_scroll_to_top-0.0.4.tar.gz", hash = "sha256:148bbaa31ca91444a94d4b1f846bcdc0de5f6b2eccaf9e815805754892a9d7f6", size = 402901 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ce/89/9099f3c5fab4b7ecef73a16bb80a59d6501d5b8ae904df162700460d15e1/streamlit_scroll_to_top-0.0.4-py3-none-any.whl", hash = "sha256:4e894ee1377fd0d65c799c39463d382d9a72fb9c592dde566ea3f6c109154128", size = 2273951 },
 ]
 
 [[package]]

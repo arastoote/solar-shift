@@ -18,15 +18,15 @@ def render(data):
 
     ## 1. Methodology
 
-    Hot water system performance was calculated using a two-stage methodology. In
+    Hot water system operation was calculated using a two-stage methodology. In
     the first stage, a thermal simulation of the hot water system is performed, and
-    in the second stage, the cost of operating the system is determined.
+    in the second stage the cost of operating the system is determined.
 
     ### 1.1 Thermal simulation
 
     The thermal simulation of the hot water systems dynamically simulates the
     temperature in the hot water storage tank and the system's use of
-    electricity or gas, taking into account:
+    electricity or gas to heat the water, taking into account:
 
     - Usage of hot water by the house, according to the selected hot water
         usage pattern
@@ -49,7 +49,7 @@ def render(data):
     calculated, the cost of operating the heater is determined. For
     electric, heat pump, and solar thermal systems, the following method
     is used to calculate the operating cost. For each half-hourly period
-    in the energy usage results:
+    in the year:
 
     1. The cost of heating using electricity from the household's solar system
     is determined. If solar electricity is available, this is used preferentially
@@ -94,14 +94,14 @@ def render(data):
     The billing type, or tariff, determines how the household is charged for electricity
     or gas use. There are three types of billing that are considered in the Solar Shift analysis:
 
-    1. Flat rate electricity/gas: a fixed rate for electricity or gas is charged
+    1. **Flat rate electricity/gas**: a fixed rate for electricity or gas is charged
     regardless of when it is used.
     
-    2. Controlled load discount electricity: a fixed rate is also used for controlled
+    2. **Controlled load discount electricity**: a fixed rate is also used for controlled
     load, but a lower rate is charged because the load is typically shifted to times when the cost
     is lower for the grid to supply energy to the household.
     
-    3. Time-varying rate electricity: the rate charged for electricity depends on the
+    3. **Time-varying rate electricity**: the rate charged for electricity depends on the
     time of use.
 
     ## 3. Hot water heaters
@@ -111,8 +111,9 @@ def render(data):
     Electric hot water heaters refer to electric tank-based systems. Electric hot water
     systems use a resistive element similar to those found in an oven to heat a tank of
     hot water. The tank allows the hot water to be heated and then stored, which means
-    these systems can be operated very flexibly, heating when electricity is cheaper, such as overnight, or when solar electricity is available, with the hot water stored
-    for use later. These systems are very simple and, therefore, are cheap to
+    these systems can be operated very flexibly, heating when electricity is cheaper, 
+    such as overnight, or when solar electricity is available, with the hot water stored
+    for use later. These systems are very simple and cheap to
     install. Electric hot water heaters can also be paired with a solar electricity
     diverter, which measures how much electricity is being exported to the grid and
     adjusts the heater power consumption to match the amount of spare solar electricity.
