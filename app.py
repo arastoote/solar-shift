@@ -47,6 +47,9 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+if 'scroll_to_top' not in st.session_state:
+    st.session_state.scroll_to_top = False
+
 if st.session_state.scroll_to_top:
     scroll_to_here(1000, key='top')  # Scroll to the top of the page, 0 means instantly, but you can add a delay (im milliseconds)
     st.session_state.scroll_to_top = False  # Reset the state after scrolling
