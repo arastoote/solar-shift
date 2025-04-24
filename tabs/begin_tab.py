@@ -35,9 +35,12 @@ def render(data):
         big_labels = {
             "Location": "Where is your house?",
             "Household occupants": "How many people live there?",
-            "Hot water usage pattern": "When do you typically use most of your hot water?",
+            "Hot water usage pattern": [
+                    "When do you typically use most of your hot water?",
+                    "(please see **Hot water usage patterns** section under the **Details** tab)"
+                ],
             "Solar": "Do you have a solar elecricity system (PV)?",
-            "Hot water billing type": "What type of hot water heater do you have?",
+            "Hot water billing type": "How do pay your bill for heating hot water?",
             "Heater": "What type of hot water heater do you have?",
             "Heater control": "Is your hot water heater being controlled?"
         }
@@ -53,7 +56,7 @@ def render(data):
         )
 
         # Create cashflow plot.
-        with st.expander("Spending", expanded=True):
+        with st.expander("Spending summary", expanded=True):
             columns_to_plot = [
                 "Up front cost ($)",
                 "Rebates ($)",
@@ -62,7 +65,7 @@ def render(data):
             ]
 
             bar_chart = px.bar(
-                data, x="System", y=columns_to_plot, barmode="group", height=200
+                data, x="System", y=columns_to_plot, text_auto=True, barmode="group", height=200
             )
 
             apply_chart_formatting(bar_chart, yaxes_title="Costs")
@@ -75,11 +78,11 @@ def render(data):
 
 
         # Create net present cost plot.
-        with st.expander("Simple financial comparison", expanded=False):
+        with st.expander("Simple financial summary", expanded=False):
             columns_to_plot = ["Net present cost ($)"]
 
             bar_chart = px.bar(
-                data, x="System", y=columns_to_plot, barmode="group"
+                data, x="System", y=columns_to_plot, text_auto=True, barmode="group"
             )
 
             apply_chart_formatting(
@@ -93,15 +96,19 @@ def render(data):
             )
 
         # Create CO2 plot.
-        with st.expander("Environmental comparison", expanded=False):
+        with st.expander("Environmental summary", expanded=False):
             columns_to_plot = ["CO2 emissions (tons/yr)"]
 
             bar_chart = px.bar(
-                data, x="System", y=columns_to_plot, barmode="group", height=200
+                data, x="System", y=columns_to_plot, text_auto=True, barmode="group", height=200
             )
 
             apply_chart_formatting(
                 bar_chart, yaxes_title="CO2 emissions (tons/yr)", show_legend=False
+            )
+
+            bar_chart.update_traces(
+                texttemplate='%{y:.2f}',
             )
 
             st.plotly_chart(
@@ -111,7 +118,7 @@ def render(data):
             )
 
         # Create table with system performance metrics.
-        with st.expander("Tabular performance comparison", expanded=False):
+        with st.expander("Tabular summary ", expanded=False):
             # This hides these columns.
             column_config = {
                 "Location": None,
@@ -143,7 +150,7 @@ def render(data):
             text="Compare to a Heat Pump",
             prompt=prompt_to_complete_questions,
             help="If using 'Active matching to solar' switches to 'On sunny hours'.",
-            tab=3,
+            tab=2,
             call_backs=[
                 export_settings_to_compare_tab(values, version="two"),
                 export_settings_to_compare_tab(heat_pump_config, version="three"),
@@ -152,10 +159,10 @@ def render(data):
 
         new_config = create_solar_electric(values.copy())
         make_tab_switch_button(
-            text="Compare with adding solar electric system",
+            text="Compare with adding solar electric system (PV)",
             prompt=prompt_to_complete_questions,
             help="Converts to electric if starting with gas.",
-            tab=3,
+            tab=2,
             call_backs=[
                 export_settings_to_compare_tab(values, version="two"),
                 export_settings_to_compare_tab(new_config, version="three"),

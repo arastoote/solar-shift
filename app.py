@@ -55,8 +55,8 @@ if st.session_state.scroll_to_top:
     st.session_state.scroll_to_top = False  # Reset the state after scrolling
 
 # Create the tabs of the webpage.
-home, about, begin, compare, explore, detailed_info = \
-    st.tabs(["Home", "About", "Begin", "Compare",  "Advanced explorer", "Details"])
+home, begin, compare, explore, detailed_info = \
+    st.tabs(["Home", "Begin", "Compare",  "Advanced explorer", "Details"])
 
 css = '''
 <style>
@@ -81,10 +81,6 @@ data = get_data()
 # Create Home page tab contents.
 with home:
     home_tab.render()
-
-# Create About contents tab.
-with about:
-    about_tab.render()
 
 # Create Begin contents tab.
 with begin:

@@ -17,7 +17,11 @@ def build_interactive_data_filter(data, key_version, big_labels=None):
 
     def make_big_label(group):
         if big_labels:
-            st.markdown("#### " + big_labels[group])
+            if isinstance(big_labels[group], str):
+                st.markdown("#### " + big_labels[group])
+            if isinstance(big_labels[group], list):
+                st.markdown("#### " + big_labels[group][0])
+                st.markdown(big_labels[group][1])
 
     def create_select(data, group):
         options = list(data[group].unique())

@@ -226,7 +226,7 @@ def render(data):
     st.markdown(
         f"""
         <div style="display: flex; justify-content: center; margin-bottom: 10px;">
-            <img src="data:image/png;base64,{img_base64}" width="450">
+            <img src="data:image/png;base64,{img_base64}" width="800">
         </div>
         """,
         unsafe_allow_html=True

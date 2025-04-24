@@ -55,7 +55,7 @@ def render(data):
             columns_to_plot = ["Net present cost ($)"]
 
             bar_chart = px.bar(
-                system_comparison_data, x="System", y=columns_to_plot, barmode="group"
+                system_comparison_data, x="System", text_auto=True, y=columns_to_plot, barmode="group"
             )
 
             apply_chart_formatting(
@@ -69,7 +69,7 @@ def render(data):
             )
 
         # Create cashflow plot.
-        with st.expander("Spending", expanded=True):
+        with st.expander("Spending comparison", expanded=True):
             columns_to_plot = [
                 "Up front cost ($)",
                 "Rebates ($)",
@@ -78,7 +78,7 @@ def render(data):
             ]
 
             bar_chart = px.bar(
-                system_comparison_data, x="System", y=columns_to_plot, barmode="group", height=200
+                system_comparison_data, x="System", y=columns_to_plot, text_auto=True, barmode="group", height=200
             )
 
             apply_chart_formatting(bar_chart, yaxes_title="Costs")
@@ -94,11 +94,15 @@ def render(data):
             columns_to_plot = ["CO2 emissions (tons/yr)"]
 
             bar_chart = px.bar(
-                system_comparison_data, x="System", y=columns_to_plot, barmode="group", height=200
+                system_comparison_data, x="System", y=columns_to_plot, text_auto=True, barmode="group", height=200
             )
 
             apply_chart_formatting(
                 bar_chart, yaxes_title="CO2 emissions (tons/yr)", show_legend=False
+            )
+
+            bar_chart.update_traces(
+                texttemplate='%{y:.2f}',
             )
 
             st.plotly_chart(

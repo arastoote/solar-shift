@@ -45,7 +45,7 @@ def render():
                 
         - [x] **Discover Your Savings Potential**: See how much you can save on annual energy bills with each option.
         - [x] **Reduce Your Carbon Footprint**: Understand the environmental impact of your choices.
-        - [x] **Tailored to Yo**: Get recommendations based on your unique household needs and preferences.
+        - [x] **Tailored to You**: Get recommendations based on your unique household needs and preferences.
         - [x] **Empower Your Decisio**n: Make informed choices when upgrading or purchasing a water heating system.
         
         ### How It Works
@@ -74,6 +74,22 @@ def render():
             make_tab_switch_button(
                 text="Start your journey to smarter water heating today!", 
                 prompt=False,
-                tab=2
+                tab=1
             )
     st.markdown("This tool is developed by Collaboration on Energy and Environmental (CEEM) research team at University of New South Wales (UNSW) Sydney as part of SolarShift Project sponsored by RACE for 2030 program.")
+
+    img_base64_1 = get_image_base64("images/ceem-logo.png")
+    img_base64_2 = get_image_base64("images/unsw-logo.png")
+    img_base64_3 = get_image_base64("images/race-logo.png")
+
+    st.markdown(
+        f"""
+        <br>
+        <div style="display: flex; justify-content: center; margin-bottom: 10px;">
+            <img src="data:image/png;base64,{img_base64_1}" width="200">
+            <img src="data:image/svg;base64,{img_base64_2}" width="300">
+            <img src="data:image/svg;base64,{img_base64_3}" width="200">
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
