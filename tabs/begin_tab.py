@@ -145,27 +145,34 @@ def render(data):
         else:
             prompt_to_complete_questions=False
 
-        heat_pump_config = create_basic_heat_pump_config(values.copy())
-        make_tab_switch_button(
-            text="Compare to a Heat Pump",
-            prompt=prompt_to_complete_questions,
-            help="If using 'Active matching to solar' switches to 'On sunny hours'.",
-            tab=2,
-            call_backs=[
-                export_settings_to_compare_tab(values, version="two"),
-                export_settings_to_compare_tab(heat_pump_config, version="three"),
-            ]
-        )
+        # heat_pump_config = create_basic_heat_pump_config(values.copy())
+        # make_tab_switch_button(
+        #     text="Compare to a Heat Pump",
+        #     key="compare_heat_pumps",
+        #     prompt=prompt_to_complete_questions,
+        #     help="If using 'Active matching to solar' switches to 'On sunny hours'.",
+        #     tab=2,
+        #     call_backs=[
+        #         export_settings_to_compare_tab(values, version="two"),
+        #         export_settings_to_compare_tab(heat_pump_config, version="three"),
+        #     ]
+        # )
 
-        new_config = create_solar_electric(values.copy())
-        make_tab_switch_button(
-            text="Compare with adding solar electric system (PV)",
-            prompt=prompt_to_complete_questions,
-            help="Converts to electric if starting with gas.",
-            tab=2,
-            call_backs=[
-                export_settings_to_compare_tab(values, version="two"),
-                export_settings_to_compare_tab(new_config, version="three"),
-            ]
-        )
+        # new_config = create_solar_electric(values.copy())
+        # make_tab_switch_button(
+        #     text="Compare with adding solar electric system (PV)",
+        #     key="compare_pv",
+        #     prompt=prompt_to_complete_questions,
+        #     help="Converts to electric if starting with gas.",
+        #     tab=2,
+        #     call_backs=[
+        #         export_settings_to_compare_tab(values, version="two"),
+        #         export_settings_to_compare_tab(new_config, version="three"),
+        #     ]
+        # )
 
+        def scroll():
+            st.session_state.current_tab = "Begin"
+            # st.session_state.scroll_to_top = True
+
+        st.button("hey", key="b", on_click=scroll)

@@ -25,9 +25,9 @@ To run the app on your machine use the following steps:
 
    Windows:
 
-    ```
-    powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-    ```
+  ```
+  powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+  ```
 
    MacOS and Linux:
 

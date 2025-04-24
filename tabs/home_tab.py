@@ -63,19 +63,28 @@ def render():
 
     # Button to take user to the Explore tab.
     with b:
-        with stylable_container(
-                key="Upload_Data",
-                css_styles="""
-                    button{
-                        float: right;
-                    }
-                    """
-        ):
-            make_tab_switch_button(
-                text="Start your journey to smarter water heating today!", 
-                prompt=False,
-                tab=1
-            )
+        # with stylable_container(
+        #         key="Upload_Data",
+        #         css_styles="""
+        #             button{
+        #                 float: right;
+        #             }
+        #             """
+        # ):
+        #     make_tab_switch_button(
+        #         text="Start your journey to smarter water heating today!",
+        #         key="start_journey",
+        #         prompt=False,
+        #         tab="Begin"
+        #     )
+
+        def scroll():
+            st.session_state.forced_tab = "Begin"
+            print("hey")
+            st.session_state.scroll_to_top = True
+
+        st.button("hey", key="b", on_click=scroll)
+
     st.markdown("This tool is developed by Collaboration on Energy and Environmental (CEEM) research team at University of New South Wales (UNSW) Sydney as part of SolarShift Project sponsored by RACE for 2030 program.")
 
     img_base64_1 = get_image_base64("images/ceem-logo.png")

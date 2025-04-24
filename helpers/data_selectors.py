@@ -27,8 +27,21 @@ def build_interactive_data_filter(data, key_version, big_labels=None):
         options = list(data[group].unique())
         group_key = group.lower().replace(" ", "_")
         key = f"select_{group_key}_{key_version}"
-        return selectbox(group, options, key=key, label_visibility=label_visibility)
-    
+        KEY = key.upper()
+
+        if KEY not in st.session_state:
+            selectbox(group, options, key=key, label_visibility=label_visibility)
+        else:
+            index = ([None] + options).index(st.session_state[KEY])
+            selectbox(group, options, index=index, key=key, label_visibility=label_visibility)
+
+        if st.session_state[key] == "---":
+            st.session_state[KEY] = None
+        else:
+            st.session_state[KEY] = st.session_state[key]
+
+        return st.session_state[KEY]
+
     values = {}
 
     data = data.copy()

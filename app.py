@@ -10,11 +10,10 @@ from data_processing.data_processing import (
 )
 
 # Import tab modules
-from tabs import home_tab, about_tab, begin_tab, explore_tab, compare_tab, details_tab
+from tabs import home_tab, begin_tab, explore_tab, compare_tab, details_tab
 
 # Get image used as icon in web browser tab.
 im = Image.open("images/favicon.png")
-
 
 st.set_page_config(
     page_title="SolarShift",
@@ -47,16 +46,56 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+# # Create the tabs of the webpage.
+# home, begin, compare, explore, detailed_info = \
+#     st.tabs(["Home", "Begin", "Compare",  "Advanced explorer", "Details"])
+
 if 'scroll_to_top' not in st.session_state:
     st.session_state.scroll_to_top = False
 
 if st.session_state.scroll_to_top:
-    scroll_to_here(1000, key='top')  # Scroll to the top of the page, 0 means instantly, but you can add a delay (im milliseconds)
+    scroll_to_here(0, key='top')
     st.session_state.scroll_to_top = False  # Reset the state after scrolling
 
-# Create the tabs of the webpage.
-home, begin, compare, explore, detailed_info = \
-    st.tabs(["Home", "Begin", "Compare",  "Advanced explorer", "Details"])
+st.markdown("<br>", unsafe_allow_html=True)
+
+tabs = ["Home", "Begin", "Compare",  "Advanced explorer", "Details"]
+
+
+if "radio_key_counter" not in st.session_state:
+    st.session_state["radio_key_counter"] = 0
+
+forced_tab = st.session_state.get("forced_tab", None)
+
+if forced_tab is not None:
+    print("there")
+
+    st.session_state["radio_key_counter"] += 1
+
+    key_suffix = st.session_state.get("radio_key_counter", 0)
+    tab_key = f"tab_{key_suffix}"
+
+    current_tab = st.radio(
+        "Navigate",
+        tabs,
+        index=tabs.index(forced_tab),
+        key=tab_key,
+        horizontal=True,
+        label_visibility="collapsed"
+    )
+
+    st.session_state.forced_tab = None
+
+else:
+    key_suffix = st.session_state.get("radio_key_counter", 0)
+    tab_key = f"tab_{key_suffix}"
+    current_tab = st.radio(
+        "Navigate",
+        tabs,
+        key=tab_key,
+        horizontal=True,
+        label_visibility="collapsed"
+    )
 
 css = '''
 <style>
@@ -68,32 +107,30 @@ css = '''
 
 st.markdown(css, unsafe_allow_html=True)
 
-
 # Wrap the data loading function in a function with streamlit caching enabled. This way
 # the function is only run once when the app is launched.
 @st.cache_data
 def get_data():
     return load_and_preprocess_data()
 
-
 data = get_data()
 
 # Create Home page tab contents.
-with home:
+if current_tab == "Home":
     home_tab.render()
 
 # Create Begin contents tab.
-with begin:
+if current_tab == "Begin":
     begin_tab.render(data)
 
 # Create contents of the Compare tab.
-with compare:
+if current_tab == "Compare":
     compare_tab.render(data)
 
 # Create Explore tab contents.
-with explore:
+if current_tab == "Advanced explorer":
     explore_tab.render(data)
 
 # Create content for Detail tab.
-with detailed_info:
+if current_tab == "Details":
     details_tab.render(data)
