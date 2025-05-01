@@ -218,8 +218,7 @@ def render(data):
     The user can choose the one that best matches their own usage pattern or consider
     how a hot water system might perform across several patterns if they are unsure
     which one best matches them. The chart below shows when water is used across the
-    day for each of the six usage patterns."""       
-    )
+    day for each of the six usage patterns.""")
 
     img_base64 = get_image_base64("images/usage_patterns.png")
 
@@ -229,10 +228,9 @@ def render(data):
             <img src="data:image/png;base64,{img_base64}" width="800">
         </div>
         """,
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
 
-                
     st.markdown("""
 
     ## 6. Options explored
@@ -242,8 +240,7 @@ def render(data):
     make sense from a technical perspective, e.g., it does not make sense to model a gas
     storage heater with a flat rate electricity billing type. The complete set of
     configurations that have been modelled are shown in the table below.
-    """
-    )
+    """)
     cols = ["Heater", "Heater control", "Hot water billing type", "Solar"]
     show_data = data.loc[:, cols]
     show_data = show_data.drop_duplicates(cols)

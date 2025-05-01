@@ -9,7 +9,7 @@ def render():
     # Main heading.
     st.markdown(
         "<h1 style='text-align: center; color: #FFA000;'>SolarShift Customer Hot Water Roadmap</h1>",
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
 
     # Display home page image.
@@ -20,11 +20,12 @@ def render():
             <img src="data:image/png;base64,{img_base64}" width="450">
         </div>
         """,
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
 
     # Write home page intro text.
-    st.markdown("""
+    st.markdown(
+        """
         <br>
                     
         Welcome to the **SolarShift Hot Water Roadmap Tool** – your personalized guide to smarter, greener, and more cost-effective water heating solutions!
@@ -50,7 +51,7 @@ def render():
     
         Start your journey to smarter water heating today!
         """,
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
 
     def change_tab():
@@ -61,25 +62,31 @@ def render():
         st.session_state.scroll_to_top = True
 
     # Columns to centre the button defined below.
-    a, b, c, = st.columns([1, 1, 1])
+    (
+        a,
+        b,
+        c,
+    ) = st.columns([1, 1, 1])
 
     # Button to take user to the Begin tab.
     with b:
         with stylable_container(
-                key="jump_to_begin_container",
-                css_styles="""
+            key="jump_to_begin_container",
+            css_styles="""
                     button{
                         float: right;
                     }
-                    """
+                    """,
         ):
             st.button(
                 "Start your journey to smarter water heating today!",
                 key="jump_to_begin",
-                on_click=change_tab
+                on_click=change_tab,
             )
 
-    st.markdown("This tool is developed by Collaboration on Energy and Environmental (CEEM) research team at University of New South Wales (UNSW) Sydney as part of SolarShift Project sponsored by RACE for 2030 program.")
+    st.markdown(
+        "This tool is developed by Collaboration on Energy and Environmental (CEEM) research team at University of New South Wales (UNSW) Sydney as part of SolarShift Project sponsored by RACE for 2030 program."
+    )
 
     # Add logos at bottom of the page.
     img_base64_1 = get_image_base64("images/ceem-logo.png")
@@ -95,5 +102,5 @@ def render():
             <img src="data:image/svg;base64,{img_base64_3}" width="200">
         </div>
         """,
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )

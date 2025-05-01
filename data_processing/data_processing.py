@@ -21,7 +21,7 @@ metric_columns = {
     "annual_energy_cost": "Annual cost ($/yr)",
     "annual_fit_opp_cost": "Decrease in solar export revenue ($/yr)",
     "emissions_total": "CO2 emissions (tons/yr)",
-    "annual_energy_consumption": "Annual energy consumption (kWh)"
+    "annual_energy_consumption": "Annual energy consumption (kWh)",
 }
 
 metrics = list(metric_columns.values())
@@ -31,18 +31,18 @@ metrics = list(metric_columns.values())
 def load_and_preprocess_data() -> pd.DataFrame:
     """Reads hotwater simulation results from CSVs and renames columns and values to
     more user-friendly conventions.
-    
+
     This function loads the raw hot water simulation data and transforms it by:
     1. Renaming technical column names to user-friendly display names
     2. Mapping coded values to descriptive labels for categorical variables
     3. Adding additional data for gas heaters with solar PV
-    
+
     The function is cached using Streamlit's caching mechanism to improve performance
     on subsequent calls.
-    
+
     Args:
         None
-        
+
     Returns:
         pd.DataFrame: Processed dataframe containing hot water simulation results with
                      user-friendly column names and values
@@ -69,7 +69,7 @@ def load_and_preprocess_data() -> pd.DataFrame:
             "CL3": "On overnight and sunny hours",
             "timer_SS": "On sunny hours",
             "diverter": "Active matching to solar",
-            "timer_OP": "On during off-peak billing times"
+            "timer_OP": "On during off-peak billing times",
         }
     )
 

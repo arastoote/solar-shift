@@ -1,4 +1,3 @@
-
 def create_basic_heat_pump_config(config):
     config["heater"] = "Heat Pump"
 

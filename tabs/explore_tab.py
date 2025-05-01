@@ -12,11 +12,11 @@ def render(data):
     with st.container():
         st.markdown(
             "<h3 style='text-align: center; color: #FFA000;'>Explore hot water system configurations</h1>",
-            unsafe_allow_html=True
+            unsafe_allow_html=True,
         )
         st.markdown(
             "<div style='text-align: center;'> The chart below can display many hot water simulation results at once – use the options on the left to explore the results.</div>",
-            unsafe_allow_html=True
+            unsafe_allow_html=True,
         )
 
     # Create container  which holds data selectors and plot.
@@ -33,17 +33,16 @@ def render(data):
             # Create the data selectors.
             with st.expander("Describe your house", expanded=False):
                 st.markdown(
-                    "", 
-                    help=
-                    "The options below are sequential filtered. " \
-                    "The options in lower selected box are limited by " \
-                    "the chioces made in select boxes above them."
+                    "",
+                    help="The options below are sequential filtered. "
+                    "The options in lower selected box are limited by "
+                    "the chioces made in select boxes above them.",
                 )
                 hs = st.multiselect(
                     "Household size",
                     data["Household occupants"].unique(),
                     default=3,
-                    help="The number of people living in the house."
+                    help="The number of people living in the house.",
                 )
                 if len(hs) > 0:
                     f_data = f_data[f_data["Household occupants"].isin(hs)]
@@ -53,7 +52,7 @@ def render(data):
                 patterns = st.multiselect(
                     "Hot water usage pattern",
                     f_data["Hot water usage pattern"].unique(),
-                    help="When hot water is typically used in the house."
+                    help="When hot water is typically used in the house.",
                 )
                 if len(patterns) > 0:
                     f_data = f_data[f_data["Hot water usage pattern"].isin(patterns)]
@@ -70,30 +69,31 @@ def render(data):
                     restrict when the heater is run the
                     'Control load discount electricity' needs to be selected 
                     as the billing type.
-                    """
+                    """,
                 )
                 if len(tariffs) > 0:
                     f_data = f_data[f_data["Hot water billing type"].isin(tariffs)]
                 solar = st.multiselect(
                     "Solar",
                     f_data["Solar"].unique(),
-                    help="If the house has a solar electricity system."
+                    help="If the house has a solar electricity system.",
                 )
                 if len(solar) > 0:
                     f_data = f_data[f_data["Solar"].isin(solar)]
             with st.expander("Choose a heater"):
                 st.markdown(
-                    "", 
-                    help=
-                    "The options below are sequential filtered. " \
-                    "The options in lower selected box are limited by " \
-                    "the chioces made in select boxes above them," \
-                    "including in the 'Describe your house' box."
+                    "",
+                    help="The options below are sequential filtered. "
+                    "The options in lower selected box are limited by "
+                    "the chioces made in select boxes above them,"
+                    "including in the 'Describe your house' box.",
                 )
                 heater = st.multiselect("Heater type", f_data["Heater"].unique())
                 if len(heater) > 0:
                     f_data = f_data[f_data["Heater"].isin(heater)]
-                control = st.multiselect("Control type", f_data["Heater control"].unique())
+                control = st.multiselect(
+                    "Control type", f_data["Heater control"].unique()
+                )
                 if len(control) > 0:
                     f_data = f_data[f_data["Heater control"].isin(control)]
             with st.expander("Chart options"):
@@ -114,12 +114,7 @@ def render(data):
 
         # Create the data plot.
         with right:
-            chart = px.strip(
-                f_data,
-                y=metric,
-                x=x,
-                color=color
-            )
+            chart = px.strip(f_data, y=metric, x=x, color=color)
 
             chart.update_traces(width=2.0)
 
@@ -131,7 +126,9 @@ def render(data):
     with st.container():
         # A radio selector that allows the user to choose between averaging the data
         # before displaying in the table or display the data for all selected data.
-        summarise = st.radio("Data display option", ["Average", "Show all"], label_visibility="collapsed")
+        summarise = st.radio(
+            "Data display option", ["Average", "Show all"], label_visibility="collapsed"
+        )
         # If user selects Average the data is average across groups which are the
         # combination of the chosen x-axis group and plotting color.
         table_groups = list(set((x, color)))
@@ -139,4 +136,4 @@ def render(data):
             agg_dict = {col: "mean" for col in metrics}
             show_data = show_data.groupby(table_groups, as_index=False).agg(agg_dict)
         show_data = show_data.sort_values("Net present cost ($)")
-        st.dataframe(show_data.style.format(precision=2), hide_index=True) 
+        st.dataframe(show_data.style.format(precision=2), hide_index=True)

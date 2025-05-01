@@ -2,6 +2,7 @@ import base64
 from PIL import Image
 import io
 
+
 def get_image_base64(image_path):
     img = Image.open(image_path)
     buffered = io.BytesIO()
@@ -11,7 +12,6 @@ def get_image_base64(image_path):
 
 
 def build_icon():
-
     # Put import here so streamlit server does not try and import and crash
     from cairosvg import svg2png
 
@@ -59,11 +59,10 @@ def build_icon():
     </svg>
     """
 
-    png_data = svg2png(bytestring=svg_code.encode(), output_width=192,
-                       output_height=192)
+    png_data = svg2png(
+        bytestring=svg_code.encode(), output_width=192, output_height=192
+    )
 
     # Save as PNG for favicon
     with open("favicon.png", "wb") as f:
         f.write(png_data)
-
-

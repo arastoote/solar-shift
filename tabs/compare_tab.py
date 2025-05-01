@@ -13,7 +13,7 @@ def render(data):
     # Create the heading at the top of the tab.
     st.markdown(
         "<h3 style='text-align: center; color: #FFA000;'>Compare two hot water systems in detail</h1>",
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
 
     # Create columns for the tab layout, left column for selectors and right column
@@ -24,25 +24,26 @@ def render(data):
         # Create the selectors for defining "System One" in the comparison.
         with st.expander("Current system", expanded=False):
             st.markdown(
-                "", 
-                help=
-                "The options below are sequential filtered. " \
-                "The options in lower selected box are limited by the chioces made in select boxes above them."
+                "",
+                help="The options below are sequential filtered. "
+                "The options in lower selected box are limited by the chioces made in select boxes above them.",
             )
 
-            data_two, values_two = build_interactive_data_filter(data, key_version="two")
-
+            data_two, values_two = build_interactive_data_filter(
+                data, key_version="two"
+            )
 
         # Create the selectors for defining "System One" in the comparison.
         with st.expander("Alternative system", expanded=True):
             st.markdown(
-                "", 
-                help=
-                "The options below are sequential filtered. " \
-                "The options in lower selected box are limited by the chioces made in select boxes above them."
+                "",
+                help="The options below are sequential filtered. "
+                "The options in lower selected box are limited by the chioces made in select boxes above them.",
             )
 
-            data_three, values_three = build_interactive_data_filter(data, key_version="three")
+            data_three, values_three = build_interactive_data_filter(
+                data, key_version="three"
+            )
 
     with right:
         current_system_data = data_two.copy()
@@ -56,11 +57,18 @@ def render(data):
             columns_to_plot = ["Net present cost ($)"]
 
             bar_chart = px.bar(
-                system_comparison_data, x="System", text_auto=True, y=columns_to_plot, barmode="group"
+                system_comparison_data,
+                x="System",
+                text_auto=True,
+                y=columns_to_plot,
+                barmode="group",
             )
 
             apply_chart_formatting(
-                bar_chart, yaxes_title="Net present cost ($)", show_legend=False, height=200
+                bar_chart,
+                yaxes_title="Net present cost ($)",
+                show_legend=False,
+                height=200,
             )
 
             st.plotly_chart(
@@ -75,27 +83,33 @@ def render(data):
                 "Up front cost ($)",
                 "Rebates ($)",
                 "Annual cost ($/yr)",
-                "Decrease in solar export revenue ($/yr)"
+                "Decrease in solar export revenue ($/yr)",
             ]
 
             bar_chart = px.bar(
-                system_comparison_data, x="System", y=columns_to_plot, text_auto=True, barmode="group", height=200
+                system_comparison_data,
+                x="System",
+                y=columns_to_plot,
+                text_auto=True,
+                barmode="group",
+                height=200,
             )
 
             apply_chart_formatting(bar_chart, yaxes_title="Costs")
 
-            st.plotly_chart(
-                bar_chart,
-                use_container_width=True,
-                key="Spending"
-            )
+            st.plotly_chart(bar_chart, use_container_width=True, key="Spending")
 
         # Create CO2 plot.
         with st.expander("Environmental comparison", expanded=False):
             columns_to_plot = ["CO2 emissions (tons/yr)"]
 
             bar_chart = px.bar(
-                system_comparison_data, x="System", y=columns_to_plot, text_auto=True, barmode="group", height=200
+                system_comparison_data,
+                x="System",
+                y=columns_to_plot,
+                text_auto=True,
+                barmode="group",
+                height=200,
             )
 
             apply_chart_formatting(
@@ -103,7 +117,7 @@ def render(data):
             )
 
             bar_chart.update_traces(
-                texttemplate='%{y:.2f}',
+                texttemplate="%{y:.2f}",
             )
 
             st.plotly_chart(
@@ -115,12 +129,16 @@ def render(data):
         # Create table with comparison of system configurations.
         with st.expander("Tabular details comparison", expanded=False):
             values_two["household_occupants"] = str(values_two["household_occupants"])
-            values_three["household_occupants"] = str(values_three["household_occupants"])
-            comp = pd.DataFrame({
-                "Option": values_two.keys(),
-                "Current system": values_two.values(),
-                "Alternative system": values_three.values(),
-            })
+            values_three["household_occupants"] = str(
+                values_three["household_occupants"]
+            )
+            comp = pd.DataFrame(
+                {
+                    "Option": values_two.keys(),
+                    "Current system": values_two.values(),
+                    "Alternative system": values_three.values(),
+                }
+            )
 
             st.dataframe(comp, hide_index=True)
 
@@ -134,11 +152,15 @@ def render(data):
                 "Heater": None,
                 "Heater control": None,
                 "Solar": None,
-                "Hot water usage pattern": None
+                "Hot water usage pattern": None,
             }
 
             # Create copy of the data for displaying in a table at the bottom of the
             # Explore tab.
-            system_comparison_data = system_comparison_data.loc[:, ["System"] + groups + metrics]
+            system_comparison_data = system_comparison_data.loc[
+                :, ["System"] + groups + metrics
+            ]
 
-            st.dataframe(system_comparison_data, hide_index=True, column_config=column_config)
+            st.dataframe(
+                system_comparison_data, hide_index=True, column_config=column_config
+            )
