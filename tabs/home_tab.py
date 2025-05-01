@@ -5,7 +5,7 @@ from graphics.images import get_image_base64
 
 
 def render():
-    """Renders the Home tab contents."""
+    """Renders the Home tab contents with introduction and project information."""
     # Main heading.
     st.markdown(
         "<h1 style='text-align: center; color: #FFA000;'>SolarShift Customer Hot Water Roadmap</h1>",
@@ -55,9 +55,7 @@ def render():
     )
 
     def change_tab():
-        """
-        Set the forced tab value and scroll to the top that tab.
-        """
+        """Switch to Begin tab and scroll to top."""
         st.session_state.tab = "Begin"
         st.session_state.scroll_to_top = True
 

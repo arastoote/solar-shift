@@ -2,6 +2,7 @@ import pandas as pd
 import streamlit as st
 
 
+# Column name mappings for grouping variables (categorical)
 group_columns = {
     "location": "Location",
     "household_size": "Household occupants",
@@ -14,6 +15,7 @@ group_columns = {
 
 groups = list(group_columns.values())
 
+# Column name mappings for metric variables (numerical)
 metric_columns = {
     "net_present_cost": "Net present cost ($)",
     "capital_cost": "Up front cost ($)",
@@ -47,10 +49,12 @@ def load_and_preprocess_data() -> pd.DataFrame:
         pd.DataFrame: Processed dataframe containing hot water simulation results with
                      user-friendly column names and values
     """
+    # Load raw data and rename columns
     data = pd.read_csv("data/hotwater_data.csv")
     data = data.rename(columns=group_columns)
     data = data.rename(columns=metric_columns)
 
+    # Map heater type codes to descriptive labels
     data["Heater"] = data["Heater"].map(
         {
             "resistive": "Electric",
@@ -61,6 +65,7 @@ def load_and_preprocess_data() -> pd.DataFrame:
         }
     )
 
+    # Map control strategies to user-friendly descriptions
     data["Heater control"] = data["Heater control"].map(
         {
             "GS": "Run as needed (no control)",
@@ -73,6 +78,7 @@ def load_and_preprocess_data() -> pd.DataFrame:
         }
     )
 
+    # Map usage pattern codes to descriptive text
     data["Hot water usage pattern"] = data["Hot water usage pattern"].map(
         {
             1: "Morning and evening only",
@@ -83,6 +89,8 @@ def load_and_preprocess_data() -> pd.DataFrame:
             6: "Late Night",
         }
     )
+    
+    # Map tariff codes to billing descriptions
     data["Hot water billing type"] = data["Hot water billing type"].map(
         {
             "flat": "Flat rate electricity",
@@ -92,6 +100,7 @@ def load_and_preprocess_data() -> pd.DataFrame:
         }
     )
 
+    # Convert boolean to Yes/No for readability
     data["Solar"] = data["Solar"].map(
         {
             True: "Yes",
@@ -99,7 +108,7 @@ def load_and_preprocess_data() -> pd.DataFrame:
         }
     )
 
-    # Add in gas for household with solar pv.
+    # Add gas heater data for households with solar PV
     gas_data = data[data["Heater"].isin(["Gas Storage", "Gas Instant"])].copy()
     gas_data["Solar"] = "Yes"
     data = pd.concat([data, gas_data])

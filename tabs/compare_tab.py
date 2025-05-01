@@ -8,7 +8,7 @@ from helpers.data_selectors import build_interactive_data_filter
 
 
 def render(data):
-    """Renders the Compare tab contents."""
+    """Renders the Compare tab for side-by-side system comparison."""
 
     # Create the heading at the top of the tab.
     st.markdown(
@@ -21,7 +21,7 @@ def render(data):
     left, gap, right = st.columns([1.75, 0.25, 5])
 
     with left:
-        # Create the selectors for defining "System One" in the comparison.
+        # Create the selectors for defining "Current system" in the comparison.
         with st.expander("Current system", expanded=False):
             st.markdown(
                 "",
@@ -33,7 +33,7 @@ def render(data):
                 data, key_version="two"
             )
 
-        # Create the selectors for defining "System One" in the comparison.
+        # Create the selectors for defining "Alternative system" in the comparison.
         with st.expander("Alternative system", expanded=True):
             st.markdown(
                 "",
@@ -46,6 +46,7 @@ def render(data):
             )
 
     with right:
+        # Prepare data for comparison charts
         current_system_data = data_two.copy()
         current_system_data.insert(0, "System", "Current system")
         alternative_system = data_three.copy()
@@ -128,6 +129,7 @@ def render(data):
 
         # Create table with comparison of system configurations.
         with st.expander("Tabular details comparison", expanded=False):
+            # Convert household occupants to string
             values_two["household_occupants"] = str(values_two["household_occupants"])
             values_three["household_occupants"] = str(
                 values_three["household_occupants"]
@@ -144,7 +146,12 @@ def render(data):
 
         # Create table with system performance metrics.
         with st.expander("Tabular performance comparison", expanded=False):
-            # This hides these columns.
+            # Create filtered view of data for the table
+            system_comparison_data = system_comparison_data.loc[
+                :, ["System"] + groups + metrics
+            ]
+
+            # Hide configuration columns to focus on performance metrics
             column_config = {
                 "Location": None,
                 "Household occupants": None,
@@ -155,11 +162,6 @@ def render(data):
                 "Hot water usage pattern": None,
             }
 
-            # Create copy of the data for displaying in a table at the bottom of the
-            # Explore tab.
-            system_comparison_data = system_comparison_data.loc[
-                :, ["System"] + groups + metrics
-            ]
 
             st.dataframe(
                 system_comparison_data, hide_index=True, column_config=column_config

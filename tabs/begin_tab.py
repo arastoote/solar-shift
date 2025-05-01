@@ -17,7 +17,7 @@ from data.system_configs import (
 
 
 def render(data):
-    """Renders the Compare tab contents."""
+    """Renders the Begin tab with user inputs and initial system performance summary."""
 
     # Two columns one for content and one for blank space on the right.
     contents_column, right_gap = st.columns([4, 2])
@@ -161,6 +161,7 @@ def render(data):
         )
 
         def make_compare_button(text, help, begin_config, alternative_config):
+            """Creates button to compare current system with an alternative option."""
             def call_back():
                 if None in begin_config.values():
                     st.toast(

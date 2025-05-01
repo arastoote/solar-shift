@@ -6,7 +6,7 @@ from data_processing.data_processing import metrics, groups
 
 
 def render(data):
-    """Renders the Explore tab contents."""
+    """Renders the Advanced explorer tab with flexible data filtering and visualization."""
     f_data = data.copy()
     # Write heading at the top of tab.
     with st.container():
@@ -19,7 +19,7 @@ def render(data):
             unsafe_allow_html=True,
         )
 
-    # Create container  which holds data selectors and plot.
+    # Create container which holds data selectors and plot.
     with st.container():
         # Create left column for data selectors and right column for plot.
         left, gap, right = st.columns([1.75, 0.25, 5])
@@ -30,7 +30,7 @@ def render(data):
             # Create some space to push the selectors down the page a litte.
             st.markdown("<br>", unsafe_allow_html=True)
 
-            # Create the data selectors.
+            # Create household characteristic filters
             with st.expander("Describe your house", expanded=False):
                 st.markdown(
                     "",
@@ -80,6 +80,8 @@ def render(data):
                 )
                 if len(solar) > 0:
                     f_data = f_data[f_data["Solar"].isin(solar)]
+                    
+            # Create heater configuration filters
             with st.expander("Choose a heater"):
                 st.markdown(
                     "",
@@ -96,20 +98,19 @@ def render(data):
                 )
                 if len(control) > 0:
                     f_data = f_data[f_data["Heater control"].isin(control)]
+                    
+            # Chart visualization options
             with st.expander("Chart options"):
-                # These control how the selected data is plotted.
-                # Create a selector which controls how the data is grouped on the x-axis
-                # with a default setting of Heater.
+                # Set x-axis grouping (default: Heater)
                 index = groups.index("Heater")
                 x = st.selectbox("Side-by-side", groups, index=index)
-                # Create a selector which controls how the data is colored with a
-                # default setting of Heater.
+                # Set color grouping (default: Heater)
                 color = st.selectbox("Color", groups, index=index)
+                # Set metric to display (default: Annual cost)
                 index = metrics.index("Annual cost ($/yr)")
                 metric = st.selectbox("Comparison metric", metrics, index=index)
 
-            # Create copy of the data for displaying in a table at the bottom of the
-            # Explore tab.
+            # Create copy of the data for displaying in a table
             show_data = f_data.loc[:, groups + metrics]
 
         # Create the data plot.
@@ -124,13 +125,11 @@ def render(data):
 
     # Create a container for displaying the chart data in a table.
     with st.container():
-        # A radio selector that allows the user to choose between averaging the data
-        # before displaying in the table or display the data for all selected data.
+        # Choose between averaged or detailed data display
         summarise = st.radio(
             "Data display option", ["Average", "Show all"], label_visibility="collapsed"
         )
-        # If user selects Average the data is average across groups which are the
-        # combination of the chosen x-axis group and plotting color.
+        # If Average selected, aggregate data by the chosen grouping variables
         table_groups = list(set((x, color)))
         if len(table_groups) > 0 and summarise == "Average":
             agg_dict = {col: "mean" for col in metrics}

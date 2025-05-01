@@ -37,17 +37,14 @@ def build_interactive_data_filter(
             - Dict[str, Optional[str]]: Dictionary of selected values for each filter
     """
 
+    # Determine label visibility based on big_labels presence
     if big_labels:
         label_visibility = "collapsed"
     else:
         label_visibility = "visible"
 
     def make_big_label(group: str) -> None:
-        """Create a larger, more prominent label for a filter group.
-
-        Args:
-            group: The name of the group to create a label for
-        """
+        """Create a larger, prominent label for a filter group."""
         if big_labels:
             if isinstance(big_labels[group], str):
                 st.markdown("#### " + big_labels[group])
@@ -56,23 +53,16 @@ def build_interactive_data_filter(
                 st.markdown(big_labels[group][1])
 
     def create_select(data: pd.DataFrame, group: str) -> Optional[str]:
-        """Create a select box for a specific filter group.
-
-        This function creates a dropdown selector for a specific column,
-        maintaining selection state across Streamlit reruns.
-
-        Args:
-            data: DataFrame containing the data to extract options from
-            group: The column name to create a selector for
-
-        Returns:
-            Optional[str]: The selected value, or None if no selection
-        """
+        """Create a select box with state persistence for a filter group."""
+        # Get unique values for dropdown options
         options = list(data[group].unique())
+        
+        # Create consistent key for session state
         group_key = group.lower().replace(" ", "_")
         key = f"select_{group_key}_{key_version}"
         KEY = key.upper()
 
+        # Handle selection state persistence
         if KEY not in st.session_state:
             selectbox(group, options, key=key, label_visibility=label_visibility)
         else:
@@ -85,6 +75,7 @@ def build_interactive_data_filter(
                 group, options, index=index, key=key, label_visibility=label_visibility
             )
 
+        # Handle special "---" case for no selection
         if st.session_state[key] == "---":
             st.session_state[KEY] = None
         else:
@@ -92,33 +83,50 @@ def build_interactive_data_filter(
 
         return st.session_state[KEY]
 
+    # Store selected values
     values = {}
 
+    # Create cascading filters
     data = data.copy()
+    
+    # Location filter
     make_big_label("Location")
     values["location"] = create_select(data, "Location")
     data = filter_data(data, "Location", values["location"])
+    
+    # Household occupants filter
     make_big_label("Household occupants")
     values["household_occupants"] = create_select(data, "Household occupants")
     data = filter_data(data, "Household occupants", values["household_occupants"])
+    
+    # Hot water usage pattern filter
     make_big_label("Hot water usage pattern")
     values["hot_water_usage_pattern"] = create_select(data, "Hot water usage pattern")
     data = filter_data(
         data, "Hot water usage pattern", values["hot_water_usage_pattern"]
     )
+    
+    # Solar PV presence filter
     make_big_label("Solar")
     values["solar"] = create_select(data, "Solar")
     data = filter_data(data, "Solar", values["solar"])
+    
+    # Heater type filter
     make_big_label("Heater")
     values["heater"] = create_select(data, "Heater")
     data = filter_data(data, "Heater", values["heater"])
+    
+    # Hot water billing type filter
     make_big_label("Hot water billing type")
     values["hot_water_billing_type"] = create_select(data, "Hot water billing type")
     data = filter_data(data, "Hot water billing type", values["hot_water_billing_type"])
+    
+    # Heater control filter
     make_big_label("Heater control")
     values["heater_control"] = create_select(data, "Heater control")
     data = filter_data(data, "Heater control", values["heater_control"])
 
+    # Return empty dataset if any filter is unset
     if None in values.values():
         data = filter_data(data, "Location", "-")
 

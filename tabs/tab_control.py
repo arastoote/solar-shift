@@ -17,11 +17,10 @@ def create(tab_names: List[str]) -> None:
         None
     """
 
-    # Set the default tab.
+    # Set default tab if none selected
     if "tab" not in st.session_state:
         st.session_state["tab"] = "Home"
 
-    # Function that dynamically creates a callback function tailored to a given tab.
     def change_tab_home(tab: str) -> Callable[[], None]:
         """Creates a callback function for a specific tab button.
 
@@ -36,21 +35,23 @@ def create(tab_names: List[str]) -> None:
         """
 
         def func() -> None:
+            # Update tab and trigger scroll on next rerun
             st.session_state.tab = tab
             st.session_state.scroll_to_top = True
 
         return func
 
-    # Create a button for each tab.
+    # Create buttons in equal-width columns
     for name, col in zip(tab_names, st.columns([1, 1, 1, 1, 1])):
         with col:
+            # Create full-width button with click handler
             st.button(
                 name,
                 key=name,
                 on_click=change_tab_home(name),
                 use_container_width=True,
             )
-            # Indicate the active tab by drawing a line underneath it.
+            # Highlight active tab with orange underline
             if st.session_state["tab"] == name:
                 st.markdown(
                     """

@@ -18,9 +18,10 @@ def change_label_style(label: str, font_size: Union[str, int] = "12px") -> None:
         None
 
     Note:
-        This function relies on the DOM structure of Streamlit's frontend and may
-        need adjustment if Streamlit's HTML structure changes in future versions.
+        Relies on Streamlit's DOM structure and may need adjustment if it changes.
+        Only styles the first matching element if multiple elements have the same text.
     """
+    # Inject JavaScript to find and style the target element
     html = f"""
     <script>
         var elems = window.parent.document.querySelectorAll('p');
@@ -29,4 +30,5 @@ def change_label_style(label: str, font_size: Union[str, int] = "12px") -> None:
         elem.style.color = 'Black';
     </script>
     """
+    # Render with zero height to avoid affecting layout
     st.components.v1.html(html, height=0)
