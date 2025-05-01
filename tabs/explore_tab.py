@@ -4,6 +4,7 @@ import plotly.express as px
 from graphics.charts import apply_chart_formatting
 from data_processing.data_processing import metrics, groups
 
+
 def render(data):
     """Renders the Explore tab contents."""
     f_data = data.copy()
@@ -11,7 +12,12 @@ def render(data):
     with st.container():
         st.markdown(
             "<h3 style='text-align: center; color: #FFA000;'>Explore hot water system configurations</h1>",
-            unsafe_allow_html=True)
+            unsafe_allow_html=True
+        )
+        st.markdown(
+            "<div style='text-align: center;'> The chart below can display many hot water simulation results at once – use the options on the left to explore the results.</div>",
+            unsafe_allow_html=True
+        )
 
     # Create container  which holds data selectors and plot.
     with st.container():

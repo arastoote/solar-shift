@@ -1,23 +1,25 @@
-import time
-
 import streamlit as st
-from streamlit.components.v1 import html
-import pandas as pd
 import plotly.express as px
 
 from graphics.charts import apply_chart_formatting
 from data_processing.data_processing import metrics, groups
-from helpers.switch_tabs import make_tab_switch_button
-from helpers.data_selectors import export_settings_to_compare_tab, build_interactive_data_filter
+from helpers.data_selectors import (
+    export_settings_to_compare_tab,
+    build_interactive_data_filter
+)
 from data.system_configs import (
     create_basic_heat_pump_config,
-    create_solar_electric
+    create_solar_electric,
+    create_electric,
+    create_solar_thermal,
+    create_gas_instant
 )
 
 
 def render(data):
     """Renders the Compare tab contents."""
 
+    # Two columns one for content and one for blank space on the right.
     contents_column, right_gap = st.columns([4, 2])
 
     with contents_column:
@@ -32,6 +34,7 @@ def render(data):
 
         st.markdown("Privacy", help="Please note your data is not stored by Solar Shift.")
 
+        # Define the labels to be used in the data selector.
         big_labels = {
             "Location": "Where is your house?",
             "Household occupants": "How many people live there?",
@@ -40,12 +43,20 @@ def render(data):
                     "(please see **Hot water usage patterns** section under the **Details** tab)"
                 ],
             "Solar": "Do you have a solar elecricity system (PV)?",
-            "Hot water billing type": "How do pay your bill for heating hot water?",
+            "Hot water billing type": [
+                    "How do pay your bill for heating hot water?",
+                    "(If unsure, please choose flat rate for a general estimate)"
+                ],
             "Heater": "What type of hot water heater do you have?",
             "Heater control": "Is your hot water heater being controlled?"
         }
 
-        data, values = build_interactive_data_filter(data, key_version="one", big_labels=big_labels)
+        # Build the data selector.
+        data, values = build_interactive_data_filter(
+            data,
+            key_version="one",
+            big_labels=big_labels
+        )
 
         # Add a column labeling the data as System One
         data.insert(0, "System", "Your current hot water system")
@@ -75,7 +86,6 @@ def render(data):
                 use_container_width=True,
                 key="Spending simple"
             )
-
 
         # Create net present cost plot.
         with st.expander("Simple financial summary", expanded=False):
@@ -130,8 +140,7 @@ def render(data):
                 "Hot water usage pattern": None
             }
 
-
-            data = data.loc[:, ["System"] + groups + metrics]
+            data = data.loc[:, groups + metrics]
 
             st.dataframe(data, hide_index=True, column_config=column_config)
 
@@ -140,39 +149,63 @@ def render(data):
             unsafe_allow_html=True
         )
 
-        if None in values.values():
-            prompt_to_complete_questions=True
-        else:
-            prompt_to_complete_questions=False
+        def make_compare_button(text, help, begin_config, alternative_config):
+            def call_back():
+                if None in begin_config.values():
+                    st.toast(
+                        "Please finish describing your house and hot water heater."
+                    )
+                    st.session_state[f"scroll_to_top"] = True
+                else:
+                    export_settings_to_compare_tab(begin_config, version="two")
+                    export_settings_to_compare_tab(
+                        alternative_config,
+                        version="three"
+                    )
+                    st.session_state.tab = "Compare"
+                    st.session_state.scroll_to_top = True
+            key = text.lower().replace(" ", "_")
+            st.button(text, key=key, help=help, on_click=call_back,
+                      use_container_width=True)
 
-        # heat_pump_config = create_basic_heat_pump_config(values.copy())
-        # make_tab_switch_button(
-        #     text="Compare to a Heat Pump",
-        #     key="compare_heat_pumps",
-        #     prompt=prompt_to_complete_questions,
-        #     help="If using 'Active matching to solar' switches to 'On sunny hours'.",
-        #     tab=2,
-        #     call_backs=[
-        #         export_settings_to_compare_tab(values, version="two"),
-        #         export_settings_to_compare_tab(heat_pump_config, version="three"),
-        #     ]
-        # )
+        heat_pump_config = create_basic_heat_pump_config(values.copy())
+        make_compare_button(
+            text="Compare to a Heat Pump",
+            help="If using 'Active matching to solar' switches to 'On sunny hours'.",
+            begin_config=values,
+            alternative_config=heat_pump_config
+        )
 
-        # new_config = create_solar_electric(values.copy())
-        # make_tab_switch_button(
-        #     text="Compare with adding solar electric system (PV)",
-        #     key="compare_pv",
-        #     prompt=prompt_to_complete_questions,
-        #     help="Converts to electric if starting with gas.",
-        #     tab=2,
-        #     call_backs=[
-        #         export_settings_to_compare_tab(values, version="two"),
-        #         export_settings_to_compare_tab(new_config, version="three"),
-        #     ]
-        # )
+        solar_config = create_solar_electric(values.copy())
+        make_compare_button(
+            text="Compare with adding solar electric system (PV)",
+            help="Converts to electric if starting with gas.",
+            begin_config=values,
+            alternative_config=solar_config
+        )
 
-        def scroll():
-            st.session_state.current_tab = "Begin"
-            # st.session_state.scroll_to_top = True
+        electric_config = create_electric(values.copy())
+        make_compare_button(
+            text="Compare with Electric",
+            help=None,
+            begin_config=values,
+            alternative_config=electric_config
+        )
 
-        st.button("hey", key="b", on_click=scroll)
+        solar_thermal_config = create_solar_thermal(values.copy())
+        make_compare_button(
+            text="Compare with Solar Thermal",
+            help=None,
+            begin_config=values,
+            alternative_config=solar_thermal_config
+        )
+
+        gas_config = create_gas_instant(values.copy())
+        make_compare_button(
+            text="Compare with Gas Instant",
+            help=None,
+            begin_config=values,
+            alternative_config=gas_config
+        )
+
+        st.markdown("<br><br>", unsafe_allow_html=True)

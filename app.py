@@ -1,16 +1,20 @@
-import time
-
 import streamlit as st
-from streamlit.components.v1 import html
 from PIL import Image
 from streamlit_scroll_to_top import scroll_to_here
+
+from graphics.style import change_label_style
 
 from data_processing.data_processing import (
     load_and_preprocess_data,
 )
-
-# Import tab modules
-from tabs import home_tab, begin_tab, explore_tab, compare_tab, details_tab
+from tabs import (
+    tab_control,
+    home_tab,
+    begin_tab,
+    explore_tab,
+    compare_tab,
+    details_tab
+)
 
 # Get image used as icon in web browser tab.
 im = Image.open("images/favicon.png")
@@ -46,91 +50,44 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# # Create the tabs of the webpage.
-# home, begin, compare, explore, detailed_info = \
-#     st.tabs(["Home", "Begin", "Compare",  "Advanced explorer", "Details"])
-
+# Setup for functionality that scrolls user view to top of screen.
 if 'scroll_to_top' not in st.session_state:
     st.session_state.scroll_to_top = False
 
+# Specify location to scroll to when 'top' key is used.
 if st.session_state.scroll_to_top:
     scroll_to_here(0, key='top')
     st.session_state.scroll_to_top = False  # Reset the state after scrolling
 
-st.markdown("<br>", unsafe_allow_html=True)
+# Add space that help tabs bar not get hidden.
+st.markdown("<br><br>", unsafe_allow_html=True)
 
-tabs = ["Home", "Begin", "Compare",  "Advanced explorer", "Details"]
+# Define tabs.
+tab_names = ["Home", "Begin", "Compare", "Advanced explorer", "Details"]
 
+current_tab = tab_control.create(tab_names)
 
-if "radio_key_counter" not in st.session_state:
-    st.session_state["radio_key_counter"] = 0
-
-forced_tab = st.session_state.get("forced_tab", None)
-
-if forced_tab is not None:
-    print("there")
-
-    st.session_state["radio_key_counter"] += 1
-
-    key_suffix = st.session_state.get("radio_key_counter", 0)
-    tab_key = f"tab_{key_suffix}"
-
-    current_tab = st.radio(
-        "Navigate",
-        tabs,
-        index=tabs.index(forced_tab),
-        key=tab_key,
-        horizontal=True,
-        label_visibility="collapsed"
-    )
-
-    st.session_state.forced_tab = None
-
-else:
-    key_suffix = st.session_state.get("radio_key_counter", 0)
-    tab_key = f"tab_{key_suffix}"
-    current_tab = st.radio(
-        "Navigate",
-        tabs,
-        key=tab_key,
-        horizontal=True,
-        label_visibility="collapsed"
-    )
-
-css = '''
-<style>
-    .stTabs [data-baseweb="tab-list"] button [data-testid="stMarkdownContainer"] p {
-    font-size:1.25rem;
-    }
-</style>
-'''
-
-st.markdown(css, unsafe_allow_html=True)
-
-# Wrap the data loading function in a function with streamlit caching enabled. This way
-# the function is only run once when the app is launched.
-@st.cache_data
-def get_data():
-    return load_and_preprocess_data()
-
-data = get_data()
+data = load_and_preprocess_data()
 
 # Create Home page tab contents.
-if current_tab == "Home":
+if st.session_state["tab"] == "Home":
     home_tab.render()
 
 # Create Begin contents tab.
-if current_tab == "Begin":
+if st.session_state["tab"] == "Begin":
     begin_tab.render(data)
 
 # Create contents of the Compare tab.
-if current_tab == "Compare":
+if st.session_state["tab"] == "Compare":
     compare_tab.render(data)
 
 # Create Explore tab contents.
-if current_tab == "Advanced explorer":
+if st.session_state["tab"] == "Advanced explorer":
     explore_tab.render(data)
 
 # Create content for Detail tab.
-if current_tab == "Details":
+if st.session_state["tab"] == "Details":
     details_tab.render(data)
+
+for name in tab_names:
+    change_label_style(name, font_size="20px")

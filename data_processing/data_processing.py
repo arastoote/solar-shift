@@ -1,4 +1,5 @@
 import pandas as pd
+import streamlit as st
 
 
 group_columns = {
@@ -26,9 +27,25 @@ metric_columns = {
 metrics = list(metric_columns.values())
 
 
-def load_and_preprocess_data():
+@st.cache_data
+def load_and_preprocess_data() -> pd.DataFrame:
     """Reads hotwater simulation results from CSVs and renames columns and values to
     more user-friendly conventions.
+    
+    This function loads the raw hot water simulation data and transforms it by:
+    1. Renaming technical column names to user-friendly display names
+    2. Mapping coded values to descriptive labels for categorical variables
+    3. Adding additional data for gas heaters with solar PV
+    
+    The function is cached using Streamlit's caching mechanism to improve performance
+    on subsequent calls.
+    
+    Args:
+        None
+        
+    Returns:
+        pd.DataFrame: Processed dataframe containing hot water simulation results with
+                     user-friendly column names and values
     """
     data = pd.read_csv("data/hotwater_data.csv")
     data = data.rename(columns=group_columns)

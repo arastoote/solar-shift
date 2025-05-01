@@ -11,6 +11,7 @@ def create_basic_heat_pump_config(config):
 
     return config
 
+
 def create_solar_electric(config):
     config["solar"] = "Yes"
 
@@ -19,4 +20,28 @@ def create_solar_electric(config):
         config["hot_water_billing_type"] = "Flat rate electricity"
         config["heater_control"] = "Run as needed (no control)"
 
+    return config
+
+
+def create_electric(config):
+    config["heater"] = "Electric"
+
+    if config["hot_water_billing_type"] == "Flat rate gas":
+        config["hot_water_billing_type"] = "Flat rate electricity"
+        config["heater_control"] = "Run as needed (no control)"
+
+    return config
+
+
+def create_solar_thermal(config):
+    config["heater"] = "Solar Thermal"
+    config["hot_water_billing_type"] = "Flat rate electricity"
+    config["heater_control"] = "Run as needed (no control)"
+    return config
+
+
+def create_gas_instant(config):
+    config["heater"] = "Gas Instant"
+    config["hot_water_billing_type"] = "Flat rate gas"
+    config["heater_control"] = "Run as needed (no control)"
     return config

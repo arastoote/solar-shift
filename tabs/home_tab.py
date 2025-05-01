@@ -1,14 +1,8 @@
-import time
-
 import streamlit as st
 from streamlit_extras.stylable_container import stylable_container
-from streamlit_scroll_to_top import scroll_to_here
 
 from graphics.images import get_image_base64
-from helpers.switch_tabs import make_tab_switch_button
 
-if 'scroll_to_top' not in st.session_state:
-    st.session_state.scroll_to_top = False
 
 def render():
     """Renders the Home tab contents."""
@@ -18,8 +12,8 @@ def render():
         unsafe_allow_html=True
     )
 
+    # Display home page image.
     img_base64 = get_image_base64("images/house.png")
-
     st.markdown(
         f"""
         <div style="display: flex; justify-content: center; margin-bottom: 10px;">
@@ -29,6 +23,7 @@ def render():
         unsafe_allow_html=True
     )
 
+    # Write home page intro text.
     st.markdown("""
         <br>
                     
@@ -58,35 +53,35 @@ def render():
         unsafe_allow_html=True
     )
 
-    # Columns to space buttons out.
+    def change_tab():
+        """
+        Set the forced tab value and scroll to the top that tab.
+        """
+        st.session_state.tab = "Begin"
+        st.session_state.scroll_to_top = True
+
+    # Columns to centre the button defined below.
     a, b, c, = st.columns([1, 1, 1])
 
-    # Button to take user to the Explore tab.
+    # Button to take user to the Begin tab.
     with b:
-        # with stylable_container(
-        #         key="Upload_Data",
-        #         css_styles="""
-        #             button{
-        #                 float: right;
-        #             }
-        #             """
-        # ):
-        #     make_tab_switch_button(
-        #         text="Start your journey to smarter water heating today!",
-        #         key="start_journey",
-        #         prompt=False,
-        #         tab="Begin"
-        #     )
-
-        def scroll():
-            st.session_state.forced_tab = "Begin"
-            print("hey")
-            st.session_state.scroll_to_top = True
-
-        st.button("hey", key="b", on_click=scroll)
+        with stylable_container(
+                key="jump_to_begin_container",
+                css_styles="""
+                    button{
+                        float: right;
+                    }
+                    """
+        ):
+            st.button(
+                "Start your journey to smarter water heating today!",
+                key="jump_to_begin",
+                on_click=change_tab
+            )
 
     st.markdown("This tool is developed by Collaboration on Energy and Environmental (CEEM) research team at University of New South Wales (UNSW) Sydney as part of SolarShift Project sponsored by RACE for 2030 program.")
 
+    # Add logos at bottom of the page.
     img_base64_1 = get_image_base64("images/ceem-logo.png")
     img_base64_2 = get_image_base64("images/unsw-logo.png")
     img_base64_3 = get_image_base64("images/race-logo.png")

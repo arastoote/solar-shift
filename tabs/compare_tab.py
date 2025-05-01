@@ -6,6 +6,7 @@ from graphics.charts import apply_chart_formatting
 from data_processing.data_processing import metrics, groups
 from helpers.data_selectors import build_interactive_data_filter
 
+
 def render(data):
     """Renders the Compare tab contents."""
 

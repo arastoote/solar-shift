@@ -40,7 +40,7 @@ def apply_chart_formatting(chart, show_legend=True , yaxes_title=None, height=No
         ])
 
         chart.update_yaxes(
-            range=[0, y_max * 1.15]
+            range=[0, y_max * 1.2]
         )
 
     if any(trace.type == 'bar' for trace in chart.data):
