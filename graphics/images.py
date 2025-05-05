@@ -1,7 +1,3 @@
-import base64
-from PIL import Image
-import io
-import streamlit as st
 
 
 def build_icon():

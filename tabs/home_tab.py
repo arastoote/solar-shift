@@ -1,8 +1,6 @@
 import streamlit as st
 from streamlit_extras.stylable_container import stylable_container
 
-from graphics.images import get_image_base64
-
 
 def render():
     """Renders the Home tab contents with introduction and project information."""

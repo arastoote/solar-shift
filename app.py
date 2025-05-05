@@ -59,7 +59,7 @@ st.markdown("<br><br>", unsafe_allow_html=True)
 tab_names = ["Home", "Begin", "Compare", "Advanced explorer", "Details"]
 
 # Create tab navigation bar
-current_tab = tab_control.create(tab_names)
+tab_control.create(tab_names)
 
 # Load and cache data for performance
 data = load_and_preprocess_data()

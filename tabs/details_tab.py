@@ -1,7 +1,5 @@
 import streamlit as st
 
-from graphics.images import get_image_base64
-
 
 def render(data):
     """Renders the Details tab contents."""
@@ -221,7 +219,7 @@ def render(data):
     day for each of the six usage patterns.""")
 
     # Add hot water usage patterns graph image using columns for centering
-    a, b, c = st.columns([1, 2, 1])
+    a, b, c = st.columns([1, 3, 1])
     with b:
         st.image("images/usage_patterns.png", use_container_width=True)
 
