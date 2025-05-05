@@ -220,16 +220,10 @@ def render(data):
     which one best matches them. The chart below shows when water is used across the
     day for each of the six usage patterns.""")
 
-    img_base64 = get_image_base64("images/usage_patterns.png")
-
-    st.markdown(
-        f"""
-        <div style="display: flex; justify-content: center; margin-bottom: 10px;">
-            <img src="data:image/png;base64,{img_base64}" width="800">
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    # Add hot water usage patterns graph image using columns for centering
+    a, b, c = st.columns([1, 2, 1])
+    with b:
+        st.image("images/usage_patterns.png", use_container_width=True)
 
     st.markdown("""
 

@@ -12,16 +12,10 @@ def render():
         unsafe_allow_html=True,
     )
 
-    # Display home page image.
-    img_base64 = get_image_base64("images/house.png")
-    st.markdown(
-        f"""
-        <div style="display: flex; justify-content: center; margin-bottom: 10px;">
-            <img src="data:image/png;base64,{img_base64}" width="450">
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    # Add home page image using columns for centering
+    a, b, c = st.columns([1, 2, 1])
+    with b:
+        st.image("images/house.png", use_container_width=True)
 
     # Write home page intro text.
     st.markdown(
@@ -86,19 +80,13 @@ def render():
         "This tool is developed by Collaboration on Energy and Environmental (CEEM) research team at University of New South Wales (UNSW) Sydney as part of SolarShift Project sponsored by RACE for 2030 program."
     )
 
-    # Add logos at bottom of the page.
-    img_base64_1 = get_image_base64("images/ceem-logo.png")
-    img_base64_2 = get_image_base64("images/unsw-logo.png")
-    img_base64_3 = get_image_base64("images/race-logo.png")
+    # Add logos using columns for centering
+    a, b, c, d, e = st.columns([1, 1, 1, 1, 1])
+    with b:
+        st.image("images/ceem-logo.png", use_container_width=True)
+    with c:
+        st.image("images/unsw-logo.png", use_container_width=True)
+    with d:
+        st.image("images/race-logo.png", use_container_width=True)
 
-    st.markdown(
-        f"""
-        <br>
-        <div style="display: flex; justify-content: center; margin-bottom: 10px;">
-            <img src="data:image/png;base64,{img_base64_1}" width="200">
-            <img src="data:image/svg;base64,{img_base64_2}" width="300">
-            <img src="data:image/svg;base64,{img_base64_3}" width="200">
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+

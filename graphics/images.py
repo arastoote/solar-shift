@@ -1,14 +1,7 @@
 import base64
 from PIL import Image
 import io
-
-
-def get_image_base64(image_path):
-    img = Image.open(image_path)
-    buffered = io.BytesIO()
-    img.save(buffered, format=img.format)
-    img_str = base64.b64encode(buffered.getvalue()).decode()
-    return img_str
+import streamlit as st
 
 
 def build_icon():
