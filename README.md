@@ -83,12 +83,14 @@ To run the app on your machine use the following steps:
   If the naming conventions are kept the same the webapp code should not need to be 
   modified.
 
-- If new parameter columns are added to the data then the web app may need to be 
-  updated in several places, including in `data_processing/data_processing.py`, and anywhere widgets 
-  for filter or aggregating data are defined (primarily within the `tabs/` directory).
-
-- If data naming conventions are changed, then `data_processing/data_processing.py` and anywhere a data
-  column is referenced (primarily within the `tabs/` directory) may need to be updated.
+- If new parameter columns are added to the data or naming conventions are changed then 
+  the web app may need to be updated in several places, including in:
+  - `data_processing/data_processing.py`,
+  - `helpers.data_selectors.build_interactive_data_filter`
+  - `data.system_configs.py`
+  - `tabs.begin_tab.py`
+  - `tabs.compare_tab.py`
+  - `tabs.explore_tab.py`
 
 ## Webapp hosting
 
