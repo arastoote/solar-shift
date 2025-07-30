@@ -18,7 +18,7 @@ def render(data):
 
     Hot water system operation was calculated using a two-stage methodology. In
     the first stage, a thermal simulation of the hot water system is performed, and
-    in the second stage the cost of operating the system is determined.
+    in the second stage the cost of operating the system is determined. For these simulations, a standard 315L tank is used with standard insulation material as provided by manufacturer's data-sheets.
 
     ### 1.1 Thermal simulation
 
@@ -203,7 +203,7 @@ def render(data):
     electric and heat pump hot water heaters and with the 'Flat rate electricity' billing
     type.
 
-    ### 4.7 Active matching to solar
+    ### 4.7 Diverter
 
     This control option means the water heater runs when there is spare solar
     electricity being exported to the grid. The control option is only available for

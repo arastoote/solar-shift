@@ -57,7 +57,7 @@ To run the app on your machine use the following steps:
 
 - **app.py**: The main application file that sets up the Streamlit app structure and orchestrates the different tabs.
 - **tabs/**: This directory contains individual Python files for each tab in the application.
-  - **home_tab.py**, **about_tab.py**, **explore_tab.py**, **compare_tab.py**, **details_tab.py**, **begin_tab.py**: Each file contains a `render` function responsible for displaying the content of that tab.
+  - **home_tab.py**, **about_tab.py**, **explore_tab.py**, **compare_tab.py**, **assumptions_and_details_tab.py**, **begin_tab.py**: Each file contains a `render` function responsible for displaying the content of that tab.
   - **tab_control.py**: Manages tab navigation and selection.
 - **data/**: This directory holds the data used by the application.
   - **hotwater_data.csv**: The core data displayed in the webapp.

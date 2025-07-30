@@ -7,7 +7,9 @@ from graphics.style import change_label_style
 from data_processing.data_processing import (
     load_and_preprocess_data,
 )
-from tabs import tab_control, home_tab, begin_tab, explore_tab, compare_tab, details_tab
+from tabs import tab_control, home_tab, begin_tab, explore_tab, compare_tab, assumptions_and_details_tab
+
+
 
 # Get image used as icon in web browser tab.
 im = Image.open("images/favicon.png")
@@ -56,13 +58,13 @@ if st.session_state.scroll_to_top:
 st.markdown("<br><br>", unsafe_allow_html=True)
 
 # Define tabs.
-tab_names = ["Home", "Begin", "Compare", "Advanced explorer", "Details"]
+tab_names = ["Home", "Begin", "Compare", "Advanced explorer", "Assumptions & details"]
 
 # Create tab navigation bar
 tab_control.create(tab_names)
 
 # Load and cache data for performance
-data = load_and_preprocess_data()
+data, postcode_df = load_and_preprocess_data() #Modified by Arastoo
 
 # Render tab content based on selection
 
@@ -72,19 +74,19 @@ if st.session_state["tab"] == "Home":
 
 # Begin tab: Initial data exploration
 if st.session_state["tab"] == "Begin":
-    begin_tab.render(data)
+    begin_tab.render(data, postcode_df)  # Modified by Arastoo
 
 # Compare tab: Side-by-side system comparison
 if st.session_state["tab"] == "Compare":
-    compare_tab.render(data)
+    compare_tab.render(data)   # Modified by Arastoo
 
 # Advanced explorer tab: Detailed filtering options
 if st.session_state["tab"] == "Advanced explorer":
-    explore_tab.render(data)
+    explore_tab.render(data)    # Modified by Arastoo
 
-# Details tab: Technical information
-if st.session_state["tab"] == "Details":
-    details_tab.render(data)
+# Assumptions & details tab: Technical information
+if st.session_state["tab"] == "Assumptions & details":
+    assumptions_and_details_tab.render(data)   # Modified by Arastoo
 
 # Apply consistent styling to tab labels
 for name in tab_names:
