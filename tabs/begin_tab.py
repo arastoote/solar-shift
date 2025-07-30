@@ -1,11 +1,13 @@
 import streamlit as st
 import plotly.express as px
+import pandas as pd
 
 from graphics.charts import apply_chart_formatting
-from data_processing.data_processing import metrics, groups
+from data_processing.data_processing import metrics, groups, load_and_preprocess_data
 from helpers.data_selectors import (
     export_settings_to_compare_tab,
     build_interactive_data_filter,
+    get_rep_postcode_from_postcode
 )
 from data.system_configs import (
     create_basic_heat_pump_config,
@@ -15,83 +17,101 @@ from data.system_configs import (
     create_gas_instant,
 )
 
+def render(data, postcode_df):
+    data, postcode_df = load_and_preprocess_data()
 
-def render(data):
-    """Renders the Begin tab with user inputs and initial system performance summary."""
-
-    # Two columns one for content and one for blank space on the right.
     contents_column, right_gap = st.columns([4, 2])
-
     with contents_column:
-        st.markdown(
-            "<h3 style='text-align: left; color: #FFA000;'>Tell us about your house:</h1>",
-            unsafe_allow_html=True,
-        )
 
-        data = data.copy()
+        st.markdown("""
+            <style>
+            div[data-testid="column"] label, 
+            div[data-testid="column"] p, 
+            div[data-testid="column"] input {
+                font-size: 18px !important;
+                font-family: "Source Sans Pro", sans-serif !important;
+            }
+            div[data-testid="stTextInput"] label p {
+                font-size: 24px !important;
+                font-weight: 600 !important;
+            }
+            </style>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("<h3 style='color: #FFA000;'>Tell us about your house:</h3>", unsafe_allow_html=True)
+        st.markdown("Complete the questions below and we will estimate your hot water heating costs.")
+        st.markdown("Privacy", help="Your data is not stored by SolarShift Customer Hot Water Road Map tool. The tool may use data only for research purposes without any personal or confidential information.")
 
-        st.markdown(
-            "Complete the questions below and we will estimate your hot water heating costs."
-        )
+        #postcode = st.text_input("Enter your postcode", value="", max_chars=4)
 
-        st.markdown(
-            "Privacy", help="Please note your data is not stored by Solar Shift."
-        )
+        # Remember postcode using session state
+        if "postcode" not in st.session_state:
+            st.session_state["postcode"] = ""
 
-        # Define the labels to be used in the data selector.
+        postcode = st.text_input("Enter your postcode", value=st.session_state["postcode"], max_chars=4)
+
+        # Update session state only when input changes
+        if postcode != st.session_state["postcode"]:
+            st.session_state["postcode"] = postcode
+
+        rep_postcode = None
+        if postcode and postcode.isdigit():
+            rep_postcode = get_rep_postcode_from_postcode(int(postcode), postcode_df)
+        if not rep_postcode and postcode and postcode.isdigit():
+            rep_postcode = int(postcode)
+        if rep_postcode:
+            data = data[data["Location"] == rep_postcode]
+        else:
+            return
+        
+        all_systems_data = data.copy()
+        if data.empty:
+            st.warning("No data found for this postcode, please check your entry.")
+            return
+
         big_labels = {
-            "Location": "Where is your house?",
+            "Location": "What is your postcode?",
             "Household occupants": "How many people live there?",
-            "Hot water usage pattern": [
-                "When do you typically use most of your hot water?",
-                "(please see **Hot water usage patterns** section under the **Details** tab)",
-            ],
-            "Solar": "Do you have a solar elecricity system (PV)?",
-            "Hot water billing type": [
-                "How do pay your bill for heating hot water?",
-                "(If unsure, please choose flat rate for a general estimate)",
-            ],
+            "Hot water usage pattern": {"label": ["When do you typically use most of your hot water?", "(see **Assumptions & details** tab: 5. Hot water usage patterns)"]},
+            "Solar": "Do you have a solar electricity system (PV)?",
+            "Hot water billing type": ["Choose the type of tariff/energy bill you receive for water heating?", "(If unsure, choose flat rate)"],
             "Heater": "What type of hot water heater do you have?",
             "Heater control": "Is your hot water heater being controlled?",
         }
+        
+        if "begin_tab_values" not in st.session_state:
+            st.session_state["begin_tab_values"] = {}
 
-        # Build the data selector.
         data, values = build_interactive_data_filter(
-            data, key_version="one", big_labels=big_labels
+            all_systems_data, key_version="one", big_labels=big_labels, prefill_values=st.session_state["begin_tab_values"]
         )
 
-        # Add a column labeling the data as System One
+        # Save current values for persistence
+        st.session_state["begin_tab_values"] = values.copy()
+
+
+        #data, values = build_interactive_data_filter(all_systems_data, key_version="one", big_labels=big_labels)
+
+        for k in values:
+            if isinstance(values[k], str):
+                values[k] = values[k].strip()
+
+        values["location"] = rep_postcode
+
+        if data.empty:
+            return
+
         data.insert(0, "System", "Your current hot water system")
 
-        st.markdown(
-            "<br><h3 style='text-align: left; color: #FFA000;'>Your estimated hot water costs:</h1>",
-            unsafe_allow_html=True,
-        )
+        st.markdown("<h3 style='color: #FFA000;'>Your estimated hot water costs:</h3>", unsafe_allow_html=True)
 
-        # Create cashflow plot.
         with st.expander("Spending summary", expanded=True):
-            columns_to_plot = [
-                "Up front cost ($)",
-                "Rebates ($)",
-                "Annual cost ($/yr)",
-                "Decrease in solar export revenue ($/yr)",
-            ]
+            cols = ["Up front cost ($)", "Rebates ($)", "Annual cost ($/yr)", "Decrease in solar export revenue ($/yr)"]
+            chart = px.bar(data, x="System", y=cols, text_auto=True, barmode="group", height=200)
+            apply_chart_formatting(chart, yaxes_title="Costs")
+            st.plotly_chart(chart, use_container_width=True)
 
-            bar_chart = px.bar(
-                data,
-                x="System",
-                y=columns_to_plot,
-                text_auto=True,
-                barmode="group",
-                height=200,
-            )
-
-            apply_chart_formatting(bar_chart, yaxes_title="Costs")
-
-            st.plotly_chart(bar_chart, use_container_width=True, key="Spending simple")
-
-        # Create net present cost plot.
-        with st.expander("Simple financial summary", expanded=False):
+        with st.expander("Simple financial summary: Net present cost over 10yrs", expanded=True):
             columns_to_plot = ["Net present cost ($)"]
 
             bar_chart = px.bar(
@@ -110,113 +130,214 @@ def render(data):
                 use_container_width=True,
                 key="Net present cost ($) simple",
             )
+        
+        # Skip Payback section if Electric + "Active matching to solar"
+        #if values["heater"] == "Electric" and values.get("heater_control") == "Active matching to solar":
+           # return
 
-        # Create CO2 plot.
-        with st.expander("Environmental summary", expanded=False):
-            columns_to_plot = ["CO2 emissions (tons/yr)"]
+        # Payback period calculation and logic from Gas and Electric to HPs Systems
 
-            bar_chart = px.bar(
-                data,
-                x="System",
-                y=columns_to_plot,
-                text_auto=True,
-                barmode="group",
-                height=200,
-            )
+        """If user select "Electric", "Gas Instant", "Gas Storage" as current system, Payback period question comes up and then there are options to select for End-of-life or standard payback period or not looking for changing system"""
 
-            apply_chart_formatting(
-                bar_chart, yaxes_title="CO2 emissions (tons/yr)", show_legend=False
-            )
+        # Define rep_postcode to state mapping (based on postcode_to_climatezone.csv)
+        rep_postcode_to_state = {
+            2600: "ACT", 2010: "NSW", 2400: "NSW", 2647: "NSW", 2880: "NSW",
+            800: "NT", 860: "NT", 870: "NT",
+            4000: "QLD", 4220: "QLD", 4720: "QLD", 4480: "QLD", 4822: "QLD",
+            5000: "SA", 5330: "SA", 5270: "SA",
+            7000: "TAS", 7330: "TAS",
+            3000: "VIC", 3570: "VIC", 3500: "VIC",
+            6000: "WA", 6430: "WA", 6640: "WA", 6720: "WA"
+        }
 
-            bar_chart.update_traces(
-                texttemplate="%{y:.2f}",
-            )
+        if values["heater"] in ["Electric", "Gas Instant", "Gas Storage"]:
+            if values["heater"] == "Electric" and values.get("heater_control") == "Diverter":
+                st.info("Payback period calculation is not available for Electric systems with 'Diverter' control.")
+            else:
+                st.markdown("<h3 style='color: #FFA000;'>Would you like to find out the finances and emissions after switching to a heat-pump?</h3>", unsafe_allow_html=True)
+                option = st.radio("Do you want to change to a heat pump?", ["Yes, my current system comes to the end of life and needs a replacement", "Yes, I just want a more efficient system", "No"], index=2)
+                if option != "No":
+                    discount_rate = st.selectbox("Select discount rate:", [0.02, 0.04, 0.06], index=0)
+                    payback_data = []
+                    for hp_type in ["Premium Heat Pump", "Standard Heat Pump"]:
+                        if values["heater"] in ["Gas Instant", "Gas Storage"]:
+                            hp_row = all_systems_data.loc[
+                                (all_systems_data["Location"] == rep_postcode) &
+                                (all_systems_data["Household occupants"] == values["household_occupants"]) &
+                                (all_systems_data["Hot water usage pattern"] == values["hot_water_usage_pattern"]) &
+                                (all_systems_data["Heater control"] == values["heater_control"]) &
+                                (all_systems_data["Heater"] == hp_type) &
+                                (all_systems_data["Solar"] == "No") &
+                                (all_systems_data["Hot water billing type"] == "Flat rate electricity")
+                            ]
+                        elif values["heater"] == "Electric":
+                            hp_row = all_systems_data.loc[
+                                (all_systems_data["Location"] == rep_postcode) &
+                                (all_systems_data["Household occupants"] == values["household_occupants"]) &
+                                (all_systems_data["Hot water usage pattern"] == values["hot_water_usage_pattern"]) &
+                                (all_systems_data["Heater control"] == values["heater_control"]) &
+                                (all_systems_data["Hot water billing type"] == values["hot_water_billing_type"]) &
+                                (all_systems_data["Solar"] == values["solar"]) &
+                                (all_systems_data["Heater"] == hp_type)
+                            ]
+                        if hp_row.empty:
+                            print(f"No hp_row match for {hp_type} with filters.")
+                            continue
+                        hp_row = hp_row.iloc[0]
 
-            st.plotly_chart(
-                bar_chart,
-                use_container_width=True,
-                key="Environmental simple",
-            )
+                        try:
+                            old_row = all_systems_data.loc[
+                                (all_systems_data["Location"] == rep_postcode) &
+                                (all_systems_data["Household occupants"] == values["household_occupants"]) &
+                                (all_systems_data["Hot water usage pattern"] == values["hot_water_usage_pattern"]) &
+                                (all_systems_data["Heater control"] == values["heater_control"]) &
+                                (all_systems_data["Hot water billing type"] == values["hot_water_billing_type"]) &
+                                (all_systems_data["Solar"] == values["solar"]) &
+                                (all_systems_data["Heater"] == values["heater"])
+                            ]
+                        except Exception as e:
+                            print(f"Old row fallback triggered: {e}")
+                            old_row = all_systems_data.loc[
+                                (all_systems_data["Location"] == rep_postcode) &
+                                (all_systems_data["Household occupants"] == values["household_occupants"]) &
+                                (all_systems_data["Heater"] == values["heater"])
+                            ]
+                        if old_row.empty:
+                            print(f"No old_row match for heater: {values['heater']}")
+                            continue
+                        old_row = old_row.iloc[0]
 
-        # Create table with system performance metrics.
-        with st.expander("Tabular summary ", expanded=False):
-            # This hides these columns.
-            column_config = {
-                "Location": None,
-                "Household occupants": None,
-                "Hot water billing type": None,
-                "Heater": None,
-                "Heater control": None,
-                "Solar": None,
-                "Hot water usage pattern": None,
-            }
+                        print(f"old row: {old_row}")
+                        print(f"hp row: {hp_row}")
 
-            data = data.loc[:, groups + metrics]
+                        annual_savings = old_row["Annual cost ($/yr)"] + old_row["Annual supply cost ($/yr)"] - hp_row["Annual cost ($/yr)"]
+                        if annual_savings <= 0:
+                            continue
 
-            st.dataframe(data, hide_index=True, column_config=column_config)
+                        upfront_cost = hp_row["Up front cost ($)"]
 
-        st.markdown(
-            "<br><h3 style='text-align: left; color: #FFA000;'>Compare your hot water system with other options:</h1>",
-            unsafe_allow_html=True,
-        )
+                        # Rebate Logic ↓↓↓↓↓↓
+                        rebate_value = 0
+                        try:
+                            state = rep_postcode_to_state.get(rep_postcode)
+                            old_heater = values["heater"]
+                            is_heat_pump = hp_type.endswith("Heat Pump")
+                            if is_heat_pump:
+                                if state == "NSW":
+                                    rebate_value = 800 if old_heater == "Electric" else 0
+                                elif state == "VIC":
+                                    rebate_value = 840 if old_heater == "Electric" else 490
+                                elif state == "ACT":
+                                    if (upfront_cost / 2) < 500:
+                                        rebate_value = 500
+                                    elif (upfront_cost / 2) <= 2500:
+                                        rebate_value = upfront_cost / 2
+                                    else:
+                                        rebate_value = 2500
+                        except Exception as e:
+                            print(f"Rebate error for {state}: {e}")
+                        # Rebate Logic ↑↑↑↑↑↑
 
-        def make_compare_button(text, help, begin_config, alternative_config):
-            """Creates button to compare current system with an alternative option."""
-            def call_back():
-                if None in begin_config.values():
-                    st.toast(
-                        "Please finish describing your house and hot water heater."
-                    )
-                    st.session_state["scroll_to_top"] = True
-                else:
-                    export_settings_to_compare_tab(begin_config, version="two")
-                    export_settings_to_compare_tab(alternative_config, version="three")
-                    st.session_state.tab = "Compare"
-                    st.session_state.scroll_to_top = True
+                        upfront_cost -= rebate_value
 
-            key = text.lower().replace(" ", "_")
-            st.button(
-                text, key=key, help=help, on_click=call_back, use_container_width=True
-            )
+                        simple_payback = (upfront_cost - old_row["Up front cost ($)"]) / annual_savings if option.startswith("Yes, my current") else upfront_cost / annual_savings
 
-        heat_pump_config = create_basic_heat_pump_config(values.copy())
-        make_compare_button(
-            text="Compare to a Heat Pump",
-            help="If using 'Active matching to solar' switches to 'On sunny hours'.",
-            begin_config=values,
-            alternative_config=heat_pump_config,
-        )
+                        cumulative, year = 0, 0
+                        while cumulative < upfront_cost and year < 50:
+                            year += 1
+                            cumulative += annual_savings / (1 + discount_rate) ** year
 
-        solar_config = create_solar_electric(values.copy())
-        make_compare_button(
-            text="Compare with adding solar electric system (PV)",
-            help="Converts to electric if starting with gas.",
-            begin_config=values,
-            alternative_config=solar_config,
-        )
+                        print(f"--- Payback Debug ---")
+                        print(f"Heat Pump Type: {hp_type}")
+                        print(f"Old Heater: {old_heater}")
+                        print(f"State: {state}")
+                        print(f"Upfront Cost (before rebate): {hp_row['Up front cost ($)']}")
+                        print(f"Rebate Applied: {rebate_value}")
+                        print(f"Upfront Cost (after rebate): {upfront_cost}")
+                        print(f"Annual Savings: {annual_savings}")
+                        print(f"Simple Payback: {simple_payback}")
+                        print(f"Discounted Payback (yrs): {year}")
+                        print("---------------------")
 
-        electric_config = create_electric(values.copy())
-        make_compare_button(
-            text="Compare with Electric",
-            help=None,
-            begin_config=values,
-            alternative_config=electric_config,
-        )
+                        payback_data.append({
+                            "Heat Pump Type": hp_type,
+                            "Simple Payback (yrs)": round(simple_payback, 1),
+                            "Discounted Payback (yrs)": year
+                        })
 
-        solar_thermal_config = create_solar_thermal(values.copy())
-        make_compare_button(
-            text="Compare with Solar Thermal",
-            help=None,
-            begin_config=values,
-            alternative_config=solar_thermal_config,
-        )
+                    with st.expander("Estimated Payback Period", expanded=True):
+                        if payback_data:
+                            df = pd.DataFrame(payback_data)
+                            chart = px.bar(df, x="Heat Pump Type", y=["Simple Payback (yrs)", "Discounted Payback (yrs)"],
+                                           barmode="group", text_auto=True, height=200,
+                                           color_discrete_sequence=["#1AFF00", "#0FB7E6"])
+                            apply_chart_formatting(chart, yaxes_title="Years")
+                            st.plotly_chart(chart, use_container_width=True)
+                        else:
+                            st.info("Could not find matching heat pump scenarios for payback calculation.")
 
-        gas_config = create_gas_instant(values.copy())
-        make_compare_button(
-            text="Compare with Gas Instant",
-            help=None,
-            begin_config=values,
-            alternative_config=gas_config,
-        )
 
-        st.markdown("<br><br>", unsafe_allow_html=True)
+
+        #  Environmental summary 
+        """It slways comes up for current system, howver, ifPayback period question triggered it shows the emission comparison between current and HPs systems """
+
+        with st.expander("Environmental summary: Annual CO2 emissions (tons/year)", expanded=True):
+            env_rows = data[["System", "CO2 emissions (tons/yr)"]].copy()
+
+            if 'payback_data' in locals() and payback_data:
+                for hp in ["Premium Heat Pump", "Standard Heat Pump"]:
+                    hp_match = all_systems_data.loc[
+                        (all_systems_data["Location"] == rep_postcode) &
+                        (all_systems_data["Household occupants"] == values["household_occupants"]) &
+                        (all_systems_data["Heater"] == hp)
+                    ]
+                    if not hp_match.empty:
+                        hp_row = hp_match.iloc[0]
+                        env_rows = pd.concat([
+                            env_rows,
+                            pd.DataFrame({
+                                "System": [hp.replace(" Heat Pump", "").title() + " Heat Pump"],
+                                "CO2 emissions (tons/yr)": [hp_row["CO2 emissions (tons/yr)"]]
+                            })
+                        ], ignore_index=True)
+            chart = px.bar(env_rows, x="System", y="CO2 emissions (tons/yr)", color ="System",
+                           text_auto=True, barmode="group", height=220, color_discrete_sequence=["#EA0C0C", "#1AFF00", "#0FB7E6"])
+            apply_chart_formatting(chart, yaxes_title="CO2 emissions (tons/yr)", show_legend=False)
+            chart.update_traces(texttemplate="%{y:.2f}")  # force two decimals on top
+            st.plotly_chart(chart, use_container_width=True)
+
+        
+        # Debug to check what data is passed before compare buttons
+        #st.write("DEBUG data (filtered to postcode) before compare buttons:", data.head(5))
+        #st.write("DEBUG all_systems_data (copied after postcode filter):", all_systems_data.head(5))
+        #st.write("DEBUG user filter values passed to compare buttons:", values)
+        #st.write("DEBUG user filter values for CURRENT system:", values)
+        #config_check = create_basic_heat_pump_config(values.copy())
+        #st.write("DEBUG user filter values for ALTERNATIVE system:", config_check)
+    
+
+        # Compare buttons
+        st.markdown("<h3 style='color: #FFA000;'>Compare your hot water system with other options:</h3>", unsafe_allow_html=True)
+        st.markdown("Please go to **Compare** tab if you would like to further explore saving opportunities with heat-pumps (i.e. solar-soak control).</h3>", unsafe_allow_html=True)
+        compare_options = [
+            ("Compare to a Heat Pump", "If using 'Diverter' switches to 'On sunny hours'.", create_basic_heat_pump_config),
+            ("Compare with adding solar electric system (PV)", "Converts to electric if starting with gas.", create_solar_electric),
+            ("Compare with Electric", None, create_electric),
+            ("Compare with Solar Thermal", None, create_solar_thermal),
+            ("Compare with Gas Instant", None, create_gas_instant)
+        ]
+        # Filter out gas or solar thermal comparisons if current system has solar
+        #if values.get("solar") == "Yes":
+            #compare_options = [item for item in compare_options if "Gas" not in item[0] and "Solar Thermal" not in item[0]]
+
+        for text, help, func in compare_options:
+            def compare_callback(config=func(values.copy())):
+                # Adding postcode for filtering
+                config["location"] = rep_postcode
+                values["location"] = rep_postcode
+
+                export_settings_to_compare_tab(values.copy(), "two")
+                export_settings_to_compare_tab(config, "three")
+                st.session_state['tab'] = "Compare"
+                st.session_state['scroll_to_top'] = True
+            st.button(text, key=text.lower().replace(" ", "_"), help=help, on_click=compare_callback, use_container_width=True)

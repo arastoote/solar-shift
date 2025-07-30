@@ -34,7 +34,7 @@ def render():
         - [x] **Discover Your Savings Potential**: See how much you can save on annual energy bills with each option.
         - [x] **Reduce Your Carbon Footprint**: Understand the environmental impact of your choices.
         - [x] **Tailored to You**: Get recommendations based on your unique household needs and preferences.
-        - [x] **Empower Your Decisio**n: Make informed choices when upgrading or purchasing a water heating system.
+        - [x] **Empower Your Decisio**n: Make informed choices when purchasing, replacing or upgrading a water heating system.
         
         ### How It Works
         1. **Answer a Few Questions**: Tell us about your household and water usage.
